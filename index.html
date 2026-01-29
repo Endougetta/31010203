@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -170,4 +170,142 @@
     <div class="hint">click to open</div>
   </div>
 
-  <!--
+  <!-- Terminal -->
+  <div id="terminal" class="terminal" role="dialog" aria-label="terminal">
+    <div class="bar">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="title">protocol_console</div>
+    </div>
+
+    <div class="screen" id="screen"></div>
+
+    <div class="controls">
+      <button id="nextBtn">Weiter</button>
+      <button id="rebootBtn" class="ghost" style="margin-left:auto;">Reboot</button>
+      <div class="choices" id="choices">
+        <button id="selfBtn">Selbstzerstörung (joke)</button>
+        <button id="endBtn">Beenden</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const badge = document.getElementById('badge');
+  const terminal = document.getElementById('terminal');
+  const screen = document.getElementById('screen');
+  const nextBtn = document.getElementById('nextBtn');
+  const rebootBtn = document.getElementById('rebootBtn');
+  const choices = document.getElementById('choices');
+  const selfBtn = document.getElementById('selfBtn');
+  const endBtn = document.getElementById('endBtn');
+
+  const lines = [
+    "67 DETECTED",
+    "loading message...",
+    "starting protocol: BIGB31010203",
+    "ok ehrlich:",
+    "Bilcan, du bist lowkey lustig — und wir sind echt cool miteinander.",
+    "Ich wollt dir das nur kurz sagen. Kein großes Ding.",
+    "Auswahl: [Selbstzerstörung]  [Beenden]"
+  ];
+
+  const finalLine = "ich feier unseren vibe.";
+
+  let lineIndex = 0;
+  let isTyping = false;
+
+  function clearScreen(){
+    screen.innerHTML = "";
+    lineIndex = 0;
+    choices.style.display = "none";
+    nextBtn.style.display = "inline-block";
+  }
+
+  function addLineContainer(){
+    const p = document.createElement('p');
+    p.className = "line";
+    screen.appendChild(p);
+    screen.scrollTop = screen.scrollHeight;
+    return p;
+  }
+
+  async function typeLine(text){
+    isTyping = true;
+    const p = addLineContainer();
+    const cursor = document.createElement('span');
+    cursor.className = "cursor";
+    p.appendChild(cursor);
+
+    // typewriter
+    let i = 0;
+    while(i < text.length){
+      // insert before cursor
+      cursor.insertAdjacentText('beforebegin', text[i]);
+      i++;
+      await new Promise(r => setTimeout(r, 18)); // speed
+    }
+
+    cursor.remove();
+    isTyping = false;
+  }
+
+  async function next(){
+    if(isTyping) return;
+
+    // if last normal line typed -> show choices
+    if(lineIndex >= lines.length){
+      nextBtn.style.display = "none";
+      return;
+    }
+
+    const text = lines[lineIndex];
+    lineIndex++;
+
+    await typeLine(text);
+
+    if(lineIndex === lines.length){
+      // after "Auswahl..." line
+      choices.style.display = "flex";
+      nextBtn.style.display = "none";
+    }
+  }
+
+  async function finish(choice){
+    if(isTyping) return;
+    choices.style.display = "none";
+    await typeLine(choice === 'self'
+      ? "SYSTEM: Selbstzerstörung abgebrochen. (war ein joke)"
+      : "SYSTEM: Session beendet."
+    );
+    await typeLine(finalLine);
+    await typeLine("—");
+    await typeLine("Reboot? (oben rechts)");
+  }
+
+  badge.addEventListener('click', () => {
+    badge.style.display = "none";
+    terminal.style.display = "block";
+    clearScreen();
+    next();
+  });
+
+  nextBtn.addEventListener('click', next);
+  rebootBtn.addEventListener('click', () => {
+    terminal.style.display = "none";
+    badge.style.display = "grid";
+  });
+
+  selfBtn.addEventListener('click', () => finish('self'));
+  endBtn.addEventListener('click', () => finish('end'));
+
+  // keyboard: space/enter for next
+  window.addEventListener('keydown', (e) => {
+    if(terminal.style.display !== "block") return;
+    if((e.key === "Enter" || e.key === " ") && nextBtn.style.display !== "none"){
+      e.preventDefault();
+      next();
+    }
+  });
+</script>
+</body>
+</html>
