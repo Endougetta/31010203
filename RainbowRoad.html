@@ -1,0 +1,1781 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MKDS Gift – Cup wählen</title>
+  <style>
+    /* =========================================================
+       MARIO KART DS – UI INSPIRED ONE-PAGER (SINGLE FILE)
+       - no external assets
+       - DS dual screen layout
+       - keyboard + touch + mouse
+       ========================================================= */
+
+    :root{
+      /* core palette */
+      --bg1: #bfe7ff;
+      --bg2: #7fc7f2;
+      --gridA: rgba(255,255,255,0.26);
+      --gridB: rgba(0,50,100,0.06);
+
+      --navy: #0b2d5c;
+      --deep: #062147;
+      --mid: #0d3e86;
+      --mid2:#1456a8;
+      --light:#5fb9ff;
+
+      --hi: #45ffd1;
+      --hi2:#19d6ff;
+
+      --text: #eaf6ff;
+      --textDark:#0b2d5c;
+
+      --yellow:#ffd32a;
+      --yellow2:#ffbf00;
+
+      --shadow: rgba(0,0,0,0.35);
+      --glass: rgba(255,255,255,0.14);
+      --glass2: rgba(255,255,255,0.08);
+
+      --radius: 18px;
+      --btnRadius: 14px;
+
+      --scanOpacity: 0.18;
+      --noiseOpacity: 0.08;
+
+      --anim: 220ms;
+      --animSlow: 420ms;
+
+      --screenBorder: rgba(10,20,40,0.55);
+      --frame: #1a1f2a;
+      --frame2:#0e1118;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 30% 20%, #dff4ff 0%, #8ed1f7 45%, #2b6fb3 100%),
+        linear-gradient(180deg, #0d1a2a, #02050b);
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 22px;
+      overflow-x:hidden;
+    }
+
+    /* ======= DS FRAME ======= */
+    .ds{
+      width:min(980px, 100%);
+      aspect-ratio: 16/10;
+      display:grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 16px;
+      padding: 18px;
+      background: linear-gradient(180deg, var(--frame), var(--frame2));
+      border-radius: 28px;
+      box-shadow:
+        0 30px 90px rgba(0,0,0,0.55),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      position:relative;
+    }
+
+    .hinge{
+      position:absolute;
+      left: 50%;
+      top: calc(50% - 10px);
+      transform: translate(-50%, -50%);
+      width: 58%;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.3));
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+      opacity:0.75;
+      pointer-events:none;
+    }
+
+    .screen{
+      position:relative;
+      border-radius: 18px;
+      overflow:hidden;
+      border: 2px solid var(--screenBorder);
+      background: linear-gradient(180deg, rgba(0,0,0,0.26), rgba(0,0,0,0.22));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.10),
+        inset 0 -8px 40px rgba(0,0,0,0.35);
+    }
+
+    /* DS background: checker + gradient */
+    .mk-bg{
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.06)),
+        linear-gradient(90deg, rgba(255,255,255,0.10), rgba(0,0,0,0.05));
+    }
+    .mk-bg:before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background:
+        linear-gradient(90deg, var(--gridA) 1px, transparent 1px),
+        linear-gradient(180deg, var(--gridA) 1px, transparent 1px);
+      background-size: 40px 40px;
+      transform: rotate(0.0001deg);
+      opacity: 0.75;
+      mix-blend-mode: overlay;
+    }
+    .mk-bg:after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(900px 300px at 50% 10%, rgba(255,255,255,0.20), transparent 60%),
+        radial-gradient(900px 520px at 30% 90%, rgba(0,0,0,0.18), transparent 60%),
+        linear-gradient(180deg, rgba(40,120,190,0.25), rgba(8,40,90,0.18));
+      pointer-events:none;
+    }
+
+    /* diagonal sparkle line (like in your photos) */
+    .sparkle{
+      position:absolute;
+      inset:-30%;
+      background:
+        repeating-linear-gradient(135deg,
+          rgba(255,255,255,0.00) 0px,
+          rgba(255,255,255,0.00) 18px,
+          rgba(255,255,255,0.32) 19px,
+          rgba(255,255,255,0.00) 22px);
+      opacity:0.32;
+      filter: blur(0.2px);
+      transform: rotate(0deg);
+      pointer-events:none;
+    }
+
+    /* scanlines overlay */
+    .scanlines{
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0,0,0,var(--scanOpacity)) 0px,
+          rgba(0,0,0,var(--scanOpacity)) 1px,
+          rgba(0,0,0,0.0) 3px,
+          rgba(0,0,0,0.0) 5px
+        );
+      mix-blend-mode: multiply;
+      pointer-events:none;
+      opacity: 1;
+    }
+
+    .noise{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08), transparent 40%),
+        radial-gradient(circle at 80% 10%, rgba(255,255,255,0.06), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(0,0,0,0.10), transparent 50%);
+      pointer-events:none;
+      opacity: var(--noiseOpacity);
+    }
+
+    /* ======= TOP SCREEN CONTENT ======= */
+    .top-content{
+      position:relative;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      padding: 18px 18px 14px;
+    }
+
+    .logoRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .mk-logo{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      max-width: 70%;
+    }
+
+    .mk-title{
+      font-weight:900;
+      letter-spacing: 0.5px;
+      line-height:1;
+      font-size: clamp(24px, 3vw, 40px);
+      color: #eaf6ff;
+      text-shadow:
+        0 2px 0 rgba(0,0,0,0.35),
+        0 0 14px rgba(80,200,255,0.25);
+      display:flex;
+      align-items:flex-end;
+      gap: 10px;
+    }
+
+    .badge{
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #051a35;
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55));
+      border: 1px solid rgba(0,0,0,0.15);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+      white-space: nowrap;
+    }
+
+    .statusBox{
+      margin-top: 12px;
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .chip{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+      font-size: 12px;
+      color: rgba(234,246,255,0.92);
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: var(--hi);
+      box-shadow: 0 0 12px rgba(69,255,209,0.55);
+    }
+
+    .progressWrap{
+      margin-top:auto;
+      display:grid;
+      gap: 10px;
+    }
+
+    .progressTitle{
+      font-weight:800;
+      color: rgba(234,246,255,0.92);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+
+    .bar{
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow:hidden;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
+    }
+    .bar > div{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(69,255,209,0.85), rgba(25,214,255,0.85), rgba(255,211,42,0.80));
+      box-shadow: 0 0 18px rgba(69,255,209,0.28);
+      transition: width var(--animSlow) ease;
+    }
+
+    .hint{
+      font-size: 12px;
+      opacity: 0.9;
+      color: rgba(234,246,255,0.86);
+      line-height: 1.25;
+    }
+
+    /* ======= BOTTOM SCREEN CONTENT ======= */
+    .bottom-content{
+      position:relative;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      padding: 14px 14px 14px;
+      gap: 12px;
+    }
+
+    /* header text like "MODUS WÄHLEN" */
+    .header{
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      font-size: clamp(22px, 3vw, 34px);
+      color: var(--yellow);
+      text-transform: uppercase;
+      text-shadow:
+        -2px -2px 0 var(--navy),
+        2px -2px 0 var(--navy),
+        -2px 2px 0 var(--navy),
+        2px 2px 0 var(--navy),
+        0 3px 0 rgba(0,0,0,0.35);
+      padding: 4px 10px;
+      align-self:flex-start;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    .menu{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      margin-top: 2px;
+      padding: 6px 4px;
+    }
+
+    /* MKDS-ish menu button */
+    .item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--btnRadius);
+      cursor:pointer;
+      user-select:none;
+      background:
+        linear-gradient(180deg, rgba(20,86,168,0.95), rgba(11,45,92,0.92));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow:
+        0 10px 18px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        inset 0 -10px 20px rgba(0,0,0,0.22);
+      position:relative;
+      transform: translateZ(0);
+      transition: transform var(--anim) ease, filter var(--anim) ease;
+      outline:none;
+    }
+
+    .item:before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      border-radius: var(--btnRadius);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.08), transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,0.10), transparent 65%);
+      pointer-events:none;
+      opacity: 0.9;
+    }
+
+    .item:after{
+      content:"";
+      position:absolute;
+      inset: 2px;
+      border-radius: calc(var(--btnRadius) - 2px);
+      border: 1px solid rgba(0,0,0,0.20);
+      pointer-events:none;
+      opacity: 0.9;
+    }
+
+    .item:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+    .item:active{ transform: translateY(0px) scale(0.995); }
+
+    .item[aria-selected="true"]{
+      background:
+        linear-gradient(180deg, rgba(69,255,209,0.55), rgba(25,214,255,0.30)),
+        linear-gradient(180deg, rgba(20,86,168,0.95), rgba(11,45,92,0.92));
+      border-color: rgba(255,255,255,0.25);
+      box-shadow:
+        0 12px 20px rgba(0,0,0,0.30),
+        0 0 20px rgba(69,255,209,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        inset 0 -10px 20px rgba(0,0,0,0.20);
+    }
+
+    .left{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .icon{
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0.18));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      color: rgba(234,246,255,0.92);
+      flex: 0 0 auto;
+    }
+
+    .label{
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-size: 12px;
+      opacity:0.95;
+      flex: 0 0 auto;
+    }
+
+    .seen{
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.14);
+      display:flex;
+      align-items:center;
+      gap: 6px;
+    }
+    .seen .miniDot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.28);
+      box-shadow: none;
+    }
+    .seen.done .miniDot{
+      background: var(--hi);
+      box-shadow: 0 0 10px rgba(69,255,209,0.55);
+    }
+
+    /* bottom row: "REKORDE" / "OPTIONEN" style */
+    .bottomRow{
+      margin-top:auto;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 0 4px;
+    }
+
+    .smallBtn{
+      flex: 1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      user-select:none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 10px 18px rgba(0,0,0,0.20);
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: rgba(234,246,255,0.92);
+      transition: transform var(--anim) ease, filter var(--anim) ease;
+      outline:none;
+    }
+    .smallBtn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .smallBtn:active{ transform: translateY(0px) scale(0.995); }
+    .smallIcon{
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.14);
+      display:grid;
+      place-items:center;
+      font-size: 12px;
+    }
+
+    .backCorner{
+      position:absolute;
+      left: 12px;
+      bottom: 12px;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 10px 18px rgba(0,0,0,0.18);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      user-select:none;
+      transition: transform var(--anim) ease;
+      outline:none;
+    }
+    .backCorner:hover{ transform: translateY(-1px); }
+    .backCorner:active{ transform: translateY(0px) scale(0.99); }
+    .backCorner span{
+      font-weight: 1000;
+      font-size: 18px;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+
+    /* ======= MODAL / POPUP ======= */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 20px;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(6px);
+      z-index: 50;
+    }
+    .overlay.show{ display:flex; }
+
+    .popup{
+      width: min(740px, 100%);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow:
+        0 30px 90px rgba(0,0,0,0.60),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .popupTop{
+      padding: 14px 16px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(0,0,0,0.10));
+    }
+
+    .popupTitle{
+      font-weight: 1000;
+      font-size: 20px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      text-shadow:
+        -2px -2px 0 var(--navy),
+        2px -2px 0 var(--navy),
+        -2px 2px 0 var(--navy),
+        2px 2px 0 var(--navy),
+        0 3px 0 rgba(0,0,0,0.35);
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .popupTitle .pill{
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(234,246,255,0.92);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.14);
+      text-transform:none;
+      text-shadow:none;
+      flex: 0 0 auto;
+    }
+
+    .popupBody{
+      padding: 14px 16px 16px;
+      display:grid;
+      gap: 12px;
+    }
+
+    .popupText{
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 14px 14px;
+      line-height: 1.35;
+      font-size: 14px;
+      color: rgba(234,246,255,0.92);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      white-space: pre-wrap;
+    }
+
+    .popupActions{
+      display:flex;
+      gap: 12px;
+      justify-content:flex-end;
+      padding: 0 16px 16px;
+    }
+
+    .actionBtn{
+      min-width: 140px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      user-select:none;
+      border: 1px solid rgba(255,255,255,0.18);
+      background:
+        linear-gradient(180deg, rgba(20,86,168,0.95), rgba(11,45,92,0.92));
+      color: rgba(234,246,255,0.92);
+      font-weight: 1000;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        0 12px 22px rgba(0,0,0,0.30);
+      transition: transform var(--anim) ease, filter var(--anim) ease;
+      outline:none;
+    }
+    .actionBtn:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    .actionBtn:active{ transform: translateY(0px) scale(0.995); }
+    .actionBtn.secondary{
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+    }
+    .actionBtn.primary{
+      background:
+        linear-gradient(180deg, rgba(69,255,209,0.55), rgba(25,214,255,0.25)),
+        linear-gradient(180deg, rgba(20,86,168,0.95), rgba(11,45,92,0.92));
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    /* ======= OPTIONS / RECORDS PANELS (inside popup) ======= */
+    .panelGrid{
+      display:grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+    }
+
+    .panel{
+      border-radius: 16px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .panel h4{
+      margin: 0 0 10px;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: rgba(234,246,255,0.92);
+      opacity: 0.95;
+    }
+    .toggleRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .toggleRow label{
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .switch{
+      width: 56px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.14);
+      position:relative;
+      cursor:pointer;
+      flex: 0 0 auto;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
+    }
+    .switch::after{
+      content:"";
+      position:absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.45));
+      box-shadow: 0 8px 14px rgba(0,0,0,0.25);
+      transition: transform var(--anim) ease;
+    }
+    .switch.on{
+      background:
+        linear-gradient(90deg, rgba(69,255,209,0.35), rgba(25,214,255,0.18)),
+        rgba(0,0,0,0.22);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .switch.on::after{ transform: translateX(26px); }
+
+    .fileRow{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .fileRow input[type="file"]{
+      width: 100%;
+      max-width: 380px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 10px;
+      color: rgba(234,246,255,0.92);
+    }
+
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .thumb{
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      overflow:hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      display:grid;
+      place-items:center;
+      font-size: 12px;
+      color: rgba(234,246,255,0.70);
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    /* ======= CUP WON SCREEN (confetti + laurel) ======= */
+    .cupWon{
+      display:grid;
+      gap: 12px;
+      text-align:center;
+      padding: 14px 6px 8px;
+    }
+    .laurel{
+      width: 140px;
+      height: 90px;
+      margin: 0 auto;
+      position:relative;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,0.30));
+    }
+    .laurel:before, .laurel:after{
+      content:"";
+      position:absolute;
+      top: 14px;
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      border: 10px solid rgba(69,255,209,0.55);
+      border-top-color: transparent;
+      border-right-color: transparent;
+      transform: rotate(-35deg);
+    }
+    .laurel:after{
+      right: 0;
+      left: auto;
+      transform: rotate(145deg);
+      border: 10px solid rgba(255,211,42,0.55);
+      border-top-color: transparent;
+      border-left-color: transparent;
+    }
+    .cupText{
+      font-weight: 1000;
+      font-size: 18px;
+      color: rgba(234,246,255,0.94);
+      line-height: 1.25;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+    .cupSub{
+      font-size: 13px;
+      opacity: 0.92;
+      line-height: 1.3;
+      color: rgba(234,246,255,0.88);
+    }
+
+    .confetti{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .confetti i{
+      position:absolute;
+      width: 10px;
+      height: 14px;
+      border-radius: 3px;
+      opacity: 0.9;
+      animation: fall 1100ms linear infinite;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.22));
+    }
+    @keyframes fall{
+      from{ transform: translateY(-20px) rotate(0deg); }
+      to{ transform: translateY(520px) rotate(360deg); }
+    }
+
+    /* ======= responsive ======= */
+    @media (max-width: 860px){
+      .ds{
+        aspect-ratio: auto;
+        grid-template-rows: auto auto;
+      }
+      .gallery{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important; scroll-behavior:auto !important; }
+    }
+
+    /* focus styles */
+    .item:focus-visible,
+    .smallBtn:focus-visible,
+    .actionBtn:focus-visible,
+    .backCorner:focus-visible{
+      box-shadow:
+        0 0 0 3px rgba(69,255,209,0.45),
+        0 12px 22px rgba(0,0,0,0.30) !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ds" id="ds">
+    <div class="hinge"></div>
+
+    <!-- TOP SCREEN -->
+    <section class="screen" aria-label="Top Screen">
+      <div class="mk-bg"></div>
+      <div class="sparkle" aria-hidden="true"></div>
+      <div class="scanlines" id="scanTop" aria-hidden="true"></div>
+      <div class="noise" aria-hidden="true"></div>
+
+      <div class="top-content">
+        <div class="logoRow">
+          <div class="mk-logo">
+            <div class="mk-title">
+              MARIOKART <span style="opacity:.92;">DS</span>
+              <span class="badge" id="badge">2005 Vibes</span>
+            </div>
+            <div class="statusBox">
+              <div class="chip"><span class="dot"></span> Geschenk-Menü für <b id="targetName">Bilcan</b></div>
+              <div class="chip">A/Enter = OK • B/Esc = Zurück • ↑↓ = Navigieren</div>
+              <div class="chip" id="unlockChip">Cup: <b>Nostalgie</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="progressWrap">
+          <div class="progressTitle">
+            <span>FORTSCHRITT</span>
+            <span id="progressText">0 / 0</span>
+          </div>
+          <div class="bar" aria-label="Fortschrittsbalken"><div id="progressBar"></div></div>
+          <div class="hint" id="hint">
+            Öffne alle Insider-Einträge. Wenn alles abgehakt ist, wird der Cup freigeschaltet.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM SCREEN -->
+    <section class="screen" aria-label="Bottom Screen">
+      <div class="mk-bg"></div>
+      <div class="sparkle" aria-hidden="true"></div>
+      <div class="scanlines" id="scanBottom" aria-hidden="true"></div>
+      <div class="noise" aria-hidden="true"></div>
+
+      <div class="bottom-content">
+        <div class="header" id="headerText">CUP WÄHLEN</div>
+
+        <div class="menu" id="menu" role="listbox" aria-label="Menü">
+          <!-- injected via JS -->
+        </div>
+
+        <div class="bottomRow">
+          <button class="smallBtn" id="recordsBtn" type="button" aria-label="Rekorde">
+            <span class="smallIcon">🏁</span> Rekorde
+          </button>
+          <button class="smallBtn" id="optionsBtn" type="button" aria-label="Optionen">
+            <span class="smallIcon">🔧</span> Optionen
+          </button>
+        </div>
+
+        <button class="backCorner" id="backBtn" type="button" aria-label="Zurück">
+          <span>↩</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- OVERLAY / POPUP -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Dialog">
+    <div class="popup" id="popup">
+      <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+      <div class="popupTop">
+        <div class="popupTitle" id="popupTitle">
+          <span id="popupTitleText">Titel</span>
+          <span class="pill" id="popupPill">Info</span>
+        </div>
+        <div class="chip" id="popupMiniStatus"><span class="dot" style="width:8px;height:8px;"></span> Dialog</div>
+      </div>
+
+      <div class="popupBody" id="popupBody">
+        <div class="popupText" id="popupText">Text…</div>
+      </div>
+
+      <div class="popupActions" id="popupActions">
+        <button class="actionBtn secondary" id="cancelBtn" type="button">Zurück</button>
+        <button class="actionBtn primary" id="okBtn" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       DATA: Your insider entries
+       - title: menu label
+       - story: popup content
+       ========================================================= */
+
+    const TARGET_NAME = "Bilcan";
+
+    const INSIDERS = [
+      {
+        id: "nonchalant",
+        icon: "🟦",
+        title: "NONCHALANT",
+        story:
+`Als ich dich gekonnt ignoriert habe und kaum wahrgenommen habe,
+hast du mich für „nonchalant“ gehalten.
+
+Und ehrlich?
+Das war irgendwie witzig, weil es so „du“-mäßig ist:
+Du liest zwischen Zeilen,
+und ich tue so, als wäre alles normal.
+
+Plot-Twist:
+Ich war nicht cool — ich war nur in meinem Film.`
+      },
+      {
+        id: "sideeye",
+        icon: "👀",
+        title: "SIDE-EYE",
+        story:
+`Da dachtest du, ich bin ’ne Zicke,
+weil ich „67“ nicht ab konnte.
+
+Und ich seh’s noch vor mir:
+dieser Blick… dieses „Aha, so bist du also.“
+
+Heute ist das fast schon ein Meme,
+aber damals war’s ernstes Lore.`
+      },
+      {
+        id: "relevant",
+        icon: "❓",
+        title: "RELEVANT?",
+        story:
+`„Von wo soll ich wissen, dass du noch relevant sein wirst?“
+
+Das ist so ein Satz,
+der klingt wie Spaß —
+aber trifft irgendwie real.
+
+Weil genau da entscheidet sich,
+ob etwas nur „Phase“ ist,
+oder ob’s bleibt.`
+      },
+      {
+        id: "birthdaytwins",
+        icon: "🎂",
+        title: "BIRTHDAY TWINS",
+        story:
+`Das war das erste Mal,
+dass mein Geburtstag wieder „relevant“ war.
+
+(du hypersensibler.)
+
+Und lowkey:
+ich schätze,
+dass du meinen Caretaker-Mode appreciatest.
+
+Ich hinterfrage nicht —
+aber ich checke, wie du dich fühlst…
+(…glaub ich zumindest manchmal).`
+      },
+      {
+        id: "toadyoshi",
+        icon: "🍄",
+        title: "TOAD & YOSHI",
+        story:
+`Wann kann man behaupten,
+dass man mit ’ner Frau Mario Party gezockt hat?
+
+Auch wenn du das 1 vs 1 gewonnen hast:
+Unser Duo-Run hat mir richtig Spaß gemacht.
+
+Das war so:
+keine große Sache,
+aber genau deshalb war’s nice.`
+      },
+      {
+        id: "sixtyseven",
+        icon: "6️⃣7️⃣",
+        title: "67",
+        story:
+`„six seveeeen“
+
+Gott weiß,
+wie weit es dazu kam,
+dass ich das jetzt sage.
+
+Aber jetzt ist es halt so ein Ding.
+Ein Codewort.
+Ein mini Universum.`
+      },
+      {
+        id: "suessli",
+        icon: "🥣",
+        title: "SÜßLI MÜSLI",
+        story:
+`Lowkey…
+wir haben echt coole Erinnerungen zusammen.
+
+Und „Süßli Müsli“ ist genau so ein Begriff,
+der einfach existiert,
+und trotzdem alles erklärt.`
+      },
+      {
+        id: "samisalma",
+        icon: "🚗",
+        title: "SAMI & SALMA",
+        story:
+`Ich bin den beiden echt dankbar,
+dass wir so lach-kick mit denen haben konnten.
+
+Salma supa.
+Sami strammer bira. (Düsseldorf)
+
+Und ich schwöre:
+Mit dir chill ich gern im Auto
+und guck denen zu,
+wie die wie Kinder Spaß haben.`
+      },
+      {
+        id: "tischtennis",
+        icon: "🏓",
+        title: "TISCHTENNIS",
+        story:
+`Du hast meinen Schläger beansprucht.
+
+So als wär das selbstverständlich.
+So als wär das… dein Side-Quest Loot.
+
+Und irgendwie hat’s gepasst,
+weil du oft genau so bist:
+du greifst dir Dinge,
+und plötzlich fühlt’s sich normal an.`
+      }
+    ];
+
+    /* =========================================================
+       STATE + STORAGE
+       ========================================================= */
+    const LS_KEY = "mkds_gift_progress_v1";
+    const SETTINGS_KEY = "mkds_gift_settings_v1";
+    const GALLERY_KEY = "mkds_gift_gallery_v1";
+
+    const state = {
+      screen: "main",   // main
+      focusIndex: 0,
+      currentId: null,
+      progress: {},     // {id: true}
+      settings: {
+        sound: true,
+        scanlines: true,
+      },
+      gallery: [] // array of dataURLs
+    };
+
+    function load(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(raw) state.progress = JSON.parse(raw) || {};
+      }catch(e){}
+
+      try{
+        const rawS = localStorage.getItem(SETTINGS_KEY);
+        if(rawS){
+          const s = JSON.parse(rawS);
+          if(s && typeof s === "object"){
+            state.settings.sound = !!s.sound;
+            state.settings.scanlines = !!s.scanlines;
+          }
+        }
+      }catch(e){}
+
+      try{
+        const rawG = localStorage.getItem(GALLERY_KEY);
+        if(rawG){
+          const g = JSON.parse(rawG);
+          if(Array.isArray(g)) state.gallery = g;
+        }
+      }catch(e){}
+    }
+
+    function save(){
+      localStorage.setItem(LS_KEY, JSON.stringify(state.progress));
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+      localStorage.setItem(GALLERY_KEY, JSON.stringify(state.gallery));
+    }
+
+    function isSeen(id){ return !!state.progress[id]; }
+    function markSeen(id){
+      state.progress[id] = true;
+      save();
+      renderMenu();
+      updateProgressUI();
+      maybeUnlockCup();
+    }
+
+    function seenCount(){
+      return INSIDERS.filter(x => isSeen(x.id)).length;
+    }
+    function totalCount(){ return INSIDERS.length; }
+
+    function allSeen(){
+      return seenCount() === totalCount();
+    }
+
+    /* =========================================================
+       UI ELEMENTS
+       ========================================================= */
+    const menuEl = document.getElementById("menu");
+    const headerTextEl = document.getElementById("headerText");
+    const overlayEl = document.getElementById("overlay");
+    const popupTitleTextEl = document.getElementById("popupTitleText");
+    const popupPillEl = document.getElementById("popupPill");
+    const popupTextEl = document.getElementById("popupText");
+    const popupBodyEl = document.getElementById("popupBody");
+    const okBtn = document.getElementById("okBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const recordsBtn = document.getElementById("recordsBtn");
+    const optionsBtn = document.getElementById("optionsBtn");
+    const backBtn = document.getElementById("backBtn");
+    const progressTextEl = document.getElementById("progressText");
+    const progressBarEl = document.getElementById("progressBar");
+    const targetNameEl = document.getElementById("targetName");
+    const hintEl = document.getElementById("hint");
+    const badgeEl = document.getElementById("badge");
+    const unlockChipEl = document.getElementById("unlockChip");
+    const scanTopEl = document.getElementById("scanTop");
+    const scanBottomEl = document.getElementById("scanBottom");
+    const confettiEl = document.getElementById("confetti");
+
+    targetNameEl.textContent = TARGET_NAME;
+
+    /* =========================================================
+       SOUND (WebAudio, no external files)
+       ========================================================= */
+    let audioCtx = null;
+
+    function ensureAudio(){
+      if(!state.settings.sound) return;
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume().catch(()=>{});
+      }
+    }
+
+    function beep({freq=440, dur=0.06, type="square", gain=0.05, slide=0} = {}){
+      if(!state.settings.sound) return;
+      ensureAudio();
+      if(!audioCtx) return;
+
+      const t = audioCtx.currentTime;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t);
+      if(slide){
+        o.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
+      }
+      g.gain.setValueAtTime(gain, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t);
+      o.stop(t + dur + 0.02);
+    }
+
+    function sfxNavigate(){ beep({freq: 520, dur:0.045, type:"square", gain:0.04, slide: 0}); }
+    function sfxConfirm(){ beep({freq: 740, dur:0.07, type:"triangle", gain:0.05, slide: 1.18}); }
+    function sfxBack(){ beep({freq: 280, dur:0.07, type:"sawtooth", gain:0.045, slide: 0.82}); }
+    function sfxToggle(){ beep({freq: 610, dur:0.05, type:"square", gain:0.035, slide: 1.08}); }
+
+    /* =========================================================
+       RENDER MENU
+       ========================================================= */
+    function renderMenu(){
+      menuEl.innerHTML = "";
+
+      INSIDERS.forEach((it, idx) => {
+        const btn = document.createElement("div");
+        btn.className = "item";
+        btn.tabIndex = 0;
+        btn.setAttribute("role","option");
+        btn.setAttribute("data-id", it.id);
+        btn.setAttribute("aria-selected", idx === state.focusIndex ? "true" : "false");
+
+        const left = document.createElement("div");
+        left.className = "left";
+
+        const icon = document.createElement("div");
+        icon.className = "icon";
+        icon.textContent = it.icon;
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = it.title;
+
+        left.appendChild(icon);
+        left.appendChild(label);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        const seen = document.createElement("div");
+        seen.className = "seen" + (isSeen(it.id) ? " done" : "");
+        seen.innerHTML = `<span class="miniDot"></span><span>${isSeen(it.id) ? "GESEHEN" : "NEU"}</span>`;
+
+        meta.appendChild(seen);
+
+        btn.appendChild(left);
+        btn.appendChild(meta);
+
+        btn.addEventListener("click", () => openInsider(it.id));
+        btn.addEventListener("mouseenter", () => {
+          if(state.focusIndex !== idx){
+            state.focusIndex = idx;
+            sfxNavigate();
+            syncSelection();
+          }
+        });
+        btn.addEventListener("keydown", (e) => {
+          if(e.key === "Enter"){
+            openInsider(it.id);
+          }
+        });
+
+        menuEl.appendChild(btn);
+      });
+
+      syncSelection();
+    }
+
+    function syncSelection(){
+      const items = [...menuEl.querySelectorAll(".item")];
+      items.forEach((el, idx) => {
+        el.setAttribute("aria-selected", idx === state.focusIndex ? "true" : "false");
+      });
+    }
+
+    /* =========================================================
+       PROGRESS UI
+       ========================================================= */
+    function updateProgressUI(){
+      const seen = seenCount();
+      const total = totalCount();
+      progressTextEl.textContent = `${seen} / ${total}`;
+
+      const pct = total ? Math.round((seen/total)*100) : 0;
+      progressBarEl.style.width = pct + "%";
+
+      if(allSeen()){
+        hintEl.textContent = "Du hast alles gesehen. Der Cup ist freigeschaltet. 🏆";
+        unlockChipEl.innerHTML = `Cup: <b>GEWONNEN</b>`;
+        badgeEl.textContent = "Cup Complete";
+      }else{
+        hintEl.textContent = "Öffne alle Insider-Einträge. Wenn alles abgehakt ist, wird der Cup freigeschaltet.";
+        unlockChipEl.innerHTML = `Cup: <b>Nostalgie</b>`;
+        badgeEl.textContent = "2005 Vibes";
+      }
+    }
+
+    /* =========================================================
+       MODAL SYSTEM
+       ========================================================= */
+    let modalMode = "insider"; // insider | records | options | cupwon
+
+    function openModal(){
+      overlayEl.classList.add("show");
+      // focus default
+      setTimeout(()=> okBtn.focus(), 0);
+    }
+
+    function closeModal(){
+      overlayEl.classList.remove("show");
+      modalMode = "insider";
+      state.currentId = null;
+      confettiEl.innerHTML = "";
+      // return focus to selected menu item
+      const items = [...menuEl.querySelectorAll(".item")];
+      if(items[state.focusIndex]) items[state.focusIndex].focus();
+    }
+
+    function openInsider(id){
+      const it = INSIDERS.find(x => x.id === id);
+      if(!it) return;
+
+      modalMode = "insider";
+      state.currentId = id;
+
+      popupTitleTextEl.textContent = it.title;
+      popupPillEl.textContent = isSeen(id) ? "Schon gesehen" : "Neu";
+      popupTextEl.textContent = it.story;
+
+      popupBodyEl.innerHTML = `<div class="popupText" id="popupText">${escapeHTML(it.story)}</div>`;
+      // rebind because replaced
+      const newText = popupBodyEl.querySelector("#popupText");
+      newText.textContent = it.story;
+
+      okBtn.textContent = "OK";
+      cancelBtn.textContent = "ZURÜCK";
+
+      sfxConfirm();
+      openModal();
+    }
+
+    function openRecords(){
+      modalMode = "records";
+
+      popupTitleTextEl.textContent = "REKORDE";
+      popupPillEl.textContent = "Status";
+
+      const seen = seenCount();
+      const total = totalCount();
+      const list = INSIDERS.map(x => {
+        const done = isSeen(x.id);
+        return `• ${x.title} — ${done ? "GESEHEN ✅" : "OFFEN ⏳"}`;
+      }).join("\n");
+
+      popupBodyEl.innerHTML = `
+        <div class="panelGrid">
+          <div class="panel">
+            <h4>Fortschritt</h4>
+            <div class="popupText" style="margin:0;">Du hast ${seen} von ${total} Einträgen gesehen.</div>
+          </div>
+          <div class="panel">
+            <h4>Checkliste</h4>
+            <div class="popupText" style="margin:0; white-space:pre-wrap;">${escapeHTML(list)}</div>
+          </div>
+          <div class="panel">
+            <h4>Mini-Info</h4>
+            <div class="popupText" style="margin:0;">Wenn alles gesehen ist, bekommst du den Cup-Screen.</div>
+          </div>
+        </div>
+      `;
+
+      okBtn.textContent = "OK";
+      cancelBtn.textContent = "ZURÜCK";
+      sfxConfirm();
+      openModal();
+    }
+
+    function openOptions(){
+      modalMode = "options";
+
+      popupTitleTextEl.textContent = "OPTIONEN";
+      popupPillEl.textContent = "Settings";
+
+      const scanOn = state.settings.scanlines;
+      const soundOn = state.settings.sound;
+
+      popupBodyEl.innerHTML = `
+        <div class="panelGrid">
+          <div class="panel">
+            <h4>Anzeige</h4>
+            <div class="toggleRow">
+              <label>Scanlines</label>
+              <div class="switch ${scanOn ? "on" : ""}" id="swScan" role="switch" aria-checked="${scanOn}"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h4>Audio</h4>
+            <div class="toggleRow">
+              <label>UI Sounds</label>
+              <div class="switch ${soundOn ? "on" : ""}" id="swSound" role="switch" aria-checked="${soundOn}"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h4>Bilder (optional)</h4>
+            <div class="popupText" style="margin:0 0 10px;">
+              Du kannst hier Bilder auswählen (z.B. Fotos/Insider-Screens). Sie bleiben nur lokal im Browser gespeichert.
+            </div>
+            <div class="fileRow">
+              <input type="file" id="filePick" accept="image/*" multiple />
+              <button class="actionBtn secondary" id="clearGallery" type="button" style="min-width:180px;">Galerie löschen</button>
+            </div>
+            <div class="gallery" id="gallery"></div>
+          </div>
+
+          <div class="panel">
+            <h4>Fortschritt</h4>
+            <div class="fileRow">
+              <button class="actionBtn secondary" id="resetProgress" type="button" style="min-width:220px;">Fortschritt zurücksetzen</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      okBtn.textContent = "OK";
+      cancelBtn.textContent = "ZURÜCK";
+      sfxConfirm();
+      openModal();
+
+      // bind options controls after render
+      const swScan = document.getElementById("swScan");
+      const swSound = document.getElementById("swSound");
+      const filePick = document.getElementById("filePick");
+      const gallery = document.getElementById("gallery");
+      const clearGallery = document.getElementById("clearGallery");
+      const resetProgress = document.getElementById("resetProgress");
+
+      function renderGallery(){
+        gallery.innerHTML = "";
+        const items = state.gallery.slice(0, 12);
+        if(items.length === 0){
+          const empty = document.createElement("div");
+          empty.className = "thumb";
+          empty.textContent = "Keine Bilder";
+          empty.style.gridColumn = "1 / -1";
+          gallery.appendChild(empty);
+          return;
+        }
+        items.forEach((src, idx) => {
+          const t = document.createElement("div");
+          t.className = "thumb";
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "Bild " + (idx+1);
+          t.appendChild(img);
+          gallery.appendChild(t);
+        });
+      }
+      renderGallery();
+
+      swScan.addEventListener("click", () => {
+        state.settings.scanlines = !state.settings.scanlines;
+        swScan.classList.toggle("on", state.settings.scanlines);
+        swScan.setAttribute("aria-checked", state.settings.scanlines);
+        applySettings();
+        save();
+        sfxToggle();
+      });
+
+      swSound.addEventListener("click", () => {
+        state.settings.sound = !state.settings.sound;
+        swSound.classList.toggle("on", state.settings.sound);
+        swSound.setAttribute("aria-checked", state.settings.sound);
+        save();
+        sfxToggle();
+      });
+
+      clearGallery.addEventListener("click", () => {
+        state.gallery = [];
+        save();
+        renderGallery();
+        sfxBack();
+      });
+
+      resetProgress.addEventListener("click", () => {
+        state.progress = {};
+        save();
+        renderMenu();
+        updateProgressUI();
+        sfxBack();
+      });
+
+      filePick.addEventListener("change", async (e) => {
+        const files = [...(e.target.files || [])];
+        if(files.length === 0) return;
+
+        // limit to prevent huge localStorage bloat
+        const limit = 6;
+        const slice = files.slice(0, limit);
+
+        for(const f of slice){
+          const url = await readFileAsDataURL(f);
+          // keep a cap
+          state.gallery.unshift(url);
+          state.gallery = state.gallery.slice(0, 12);
+        }
+        save();
+        renderGallery();
+        sfxConfirm();
+        filePick.value = "";
+      });
+    }
+
+    function openCupWon(){
+      modalMode = "cupwon";
+
+      popupTitleTextEl.textContent = "CUP GEWONNEN";
+      popupPillEl.textContent = "Finale";
+
+      const msg =
+`Bilcan, Glückwunsch.
+
+Du hast den Cup gewonnen.
+
+Das hier ist nur ein One-Sider,
+aber die Idee dahinter ist ernst:
+Ich wollte dir etwas geben,
+das sich so anfühlt wie unser Humor,
+unsere Insider,
+und dieses „wir bleiben cool“-Gefühl.
+
+Danke, dass du da bist.`;
+
+      popupBodyEl.innerHTML = `
+        <div class="cupWon">
+          <div class="laurel"></div>
+          <div class="cupText">${escapeHTML("Bilcan, Glückwunsch — du hast den Cup gewonnen!")}</div>
+          <div class="cupSub">${escapeHTML(msg)}</div>
+        </div>
+      `;
+
+      okBtn.textContent = "OK";
+      cancelBtn.textContent = "ZURÜCK";
+
+      spawnConfetti();
+      sfxConfirm();
+      openModal();
+    }
+
+    okBtn.addEventListener("click", () => {
+      if(modalMode === "insider" && state.currentId){
+        markSeen(state.currentId);
+        sfxConfirm();
+        closeModal();
+        return;
+      }
+      sfxConfirm();
+      closeModal();
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      sfxBack();
+      closeModal();
+    });
+
+    overlayEl.addEventListener("click", (e) => {
+      // click outside popup closes
+      if(e.target === overlayEl){
+        sfxBack();
+        closeModal();
+      }
+    });
+
+    /* =========================================================
+       NAVIGATION: keyboard
+       ========================================================= */
+    document.addEventListener("keydown", (e) => {
+      // allow audio on first interaction
+      if(e.key === "Enter" || e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Escape"){
+        ensureAudio();
+      }
+
+      if(overlayEl.classList.contains("show")){
+        if(e.key === "Escape"){
+          sfxBack();
+          closeModal();
+        }else if(e.key === "Enter"){
+          okBtn.click();
+        }
+        return;
+      }
+
+      if(e.key === "ArrowDown"){
+        e.preventDefault();
+        state.focusIndex = (state.focusIndex + 1) % totalCount();
+        sfxNavigate();
+        syncSelection();
+        focusSelected();
+      }
+      if(e.key === "ArrowUp"){
+        e.preventDefault();
+        state.focusIndex = (state.focusIndex - 1 + totalCount()) % totalCount();
+        sfxNavigate();
+        syncSelection();
+        focusSelected();
+      }
+      if(e.key === "Enter"){
+        e.preventDefault();
+        const it = INSIDERS[state.focusIndex];
+        if(it) openInsider(it.id);
+      }
+    });
+
+    function focusSelected(){
+      const items = [...menuEl.querySelectorAll(".item")];
+      if(items[state.focusIndex]) items[state.focusIndex].focus();
+    }
+
+    /* =========================================================
+       BUTTONS: bottom row + back
+       ========================================================= */
+    recordsBtn.addEventListener("click", openRecords);
+    optionsBtn.addEventListener("click", openOptions);
+
+    backBtn.addEventListener("click", () => {
+      // In this one-pager, back can show cup if unlocked,
+      // otherwise shows a small hint dialog
+      if(allSeen()){
+        openCupWon();
+      }else{
+        modalMode = "records";
+        popupTitleTextEl.textContent = "HINWEIS";
+        popupPillEl.textContent = "Tipp";
+        popupBodyEl.innerHTML = `
+          <div class="popupText" style="margin:0;">
+            Noch nicht alle Einträge gesehen. Öffne alles, dann kommt der Cup-Screen.
+          </div>
+        `;
+        okBtn.textContent = "OK";
+        cancelBtn.textContent = "ZURÜCK";
+        sfxConfirm();
+        openModal();
+      }
+    });
+
+    /* =========================================================
+       SETTINGS APPLY
+       ========================================================= */
+    function applySettings(){
+      const on = state.settings.scanlines;
+      scanTopEl.style.display = on ? "block" : "none";
+      scanBottomEl.style.display = on ? "block" : "none";
+    }
+
+    /* =========================================================
+       UNLOCK LOGIC
+       ========================================================= */
+    function maybeUnlockCup(){
+      if(allSeen()){
+        // subtle auto prompt once
+        // show cup won automatically the first time after completion
+        const onceKey = "mkds_gift_cup_shown_once_v1";
+        const shown = localStorage.getItem(onceKey);
+        if(!shown){
+          localStorage.setItem(onceKey, "1");
+          setTimeout(() => openCupWon(), 320);
+        }
+      }
+    }
+
+    /* =========================================================
+       CONFETTI
+       ========================================================= */
+    function spawnConfetti(){
+      confettiEl.innerHTML = "";
+      const colors = [
+        "rgba(69,255,209,0.95)",
+        "rgba(25,214,255,0.95)",
+        "rgba(255,211,42,0.95)",
+        "rgba(255,255,255,0.85)"
+      ];
+      const count = 26;
+      for(let i=0;i<count;i++){
+        const c = document.createElement("i");
+        const left = Math.random()*100;
+        const delay = Math.random()*0.9;
+        const dur = 0.85 + Math.random()*0.7;
+        const w = 8 + Math.random()*10;
+        const h = 10 + Math.random()*16;
+
+        c.style.left = left + "%";
+        c.style.top = (-10 - Math.random()*40) + "px";
+        c.style.width = w + "px";
+        c.style.height = h + "px";
+        c.style.background = colors[Math.floor(Math.random()*colors.length)];
+        c.style.animationDelay = delay + "s";
+        c.style.animationDuration = dur + "s";
+        c.style.transform = `rotate(${Math.random()*180}deg)`;
+        confettiEl.appendChild(c);
+      }
+    }
+
+    /* =========================================================
+       HELPERS
+       ========================================================= */
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function readFileAsDataURL(file){
+      return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+      });
+    }
+
+    /* =========================================================
+       INIT
+       ========================================================= */
+    function init(){
+      load();
+      applySettings();
+      renderMenu();
+      updateProgressUI();
+      maybeUnlockCup();
+
+      // set initial focus for accessibility
+      setTimeout(() => {
+        const items = [...menuEl.querySelectorAll(".item")];
+        if(items[state.focusIndex]) items[state.focusIndex].focus();
+      }, 0);
+
+      // allow click anywhere on DS frame to enable audio context
+      document.getElementById("ds").addEventListener("pointerdown", () => ensureAudio(), {once:false});
+    }
+
+    init();
+  </script>
+</body>
+</html>
