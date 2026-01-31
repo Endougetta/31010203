@@ -3,871 +3,870 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Mario Kart DS – Nostalgie Gift (One-Sider)</title>
+  <title>MKDS Nostalgie Gift — Bilcan</title>
 
   <style>
     /* ============================================================
-      MKDS Gift One-Sider (Single HTML)
-      - Pixel-dominant Look
-      - DS Top/Bottom Screen Layout
-      - Menu Items -> Dialog Popup (OK / ABBRECHEN)
-      - OK = abgehakt
-      - Wenn alles gesehen: "Bilcan Glückwunsch du hast Den Cup gewonnen"
-      - Pilz-Cup: Mini-Game (Endlos Runner in 3 Lanes)
-      - Keine externen Assets, Sounds via WebAudio
+      MKDS Nostalgie Gift — NEW LAYOUT (No Preview, No Scroll Menu)
+      - Fullscreen Hub (icons + titles)
+      - Click icon => Popup/“Seite”
+      - Buttons: WEITER / BEENDEN (no OK/Abbrechen)
+      - Multi-sentence content => WEITER steps through sentences
+      - Each sentence: typewriter (zeichen für zeichen)
+      - Pilz-Cup => simple jump game (Chrome dino-style) with "67"
+      - birthday twins => square image twin.png (place file next to this html)
+      - optional victory image => cup.png (place file next to this html)
+      - No external assets; audio via WebAudio
     ============================================================ */
 
     :root{
-      --bg1:#bfe6ff;
-      --bg2:#8fd2ff;
-      --gridA: rgba(255,255,255,0.18);
-      --gridB: rgba(0,0,0,0.06);
+      --ink:#0b0b0b;
+      --paper:#f7fbff;
+      --shade:rgba(0,0,0,.18);
 
-      --navy:#0a2a5a;
-      --deep:#0b1b3f;
-      --mid:#155bb5;
-      --mid2:#1a74d6;
-      --lite:#45baff;
-      --lite2:#8ce6ff;
+      /* new palette (different from last attempt) */
+      --bg0:#0a0f1d;
+      --bg1:#0e1430;
+      --bg2:#141b3f;
 
-      --accent:#2ff1ff;
-      --accent2:#00c8ff;
+      --neon1:#44f0ff;
+      --neon2:#7cff66;
+      --neon3:#ffce4d;
+      --neon4:#ff4d9a;
+      --neon5:#8a6bff;
 
-      --outline:#081838;
-      --shadow: rgba(0,0,0,0.35);
+      --panel:#f1f6ff;
+      --panel2:#e4efff;
 
-      --title:#ffd54a;
-      --title2:#ffb300;
+      --border:#0c1433;
+      --border2:#1a2a66;
 
-      --paper:#e9f6ff;
-      --ink:#0a0a0a;
+      --btn:#ffffff;
+      --btn2:#e9f6ff;
 
-      --ok:#2df5a6;
-      --warn:#ff5e7e;
+      --shadow: rgba(0,0,0,.45);
+      --glow: rgba(68,240,255,.22);
 
-      --px: 1; /* base pixel scaling hint */
-      --radius: 18px;
-      --bevel: 10px;
-
-      --uiScale: 1;
+      /* pixel font vibe */
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --radius: 22px;
     }
 
-    /* --- Global reset --- */
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
+      overflow:hidden; /* no scroll (user request) */
+      font-family: var(--mono);
       color: var(--ink);
-      background:
-        radial-gradient(1200px 700px at 30% 10%, rgba(255,255,255,0.6), transparent 55%),
-        radial-gradient(900px 600px at 70% 30%, rgba(255,255,255,0.35), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      overflow-x:hidden;
+      background: radial-gradient(1200px 800px at 20% 20%, rgba(68,240,255,.10), transparent 55%),
+                  radial-gradient(900px 700px at 80% 40%, rgba(255,77,154,.08), transparent 55%),
+                  radial-gradient(1200px 900px at 40% 90%, rgba(122,255,102,.08), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg2));
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* --- Pixel-ish type: black, readable, dominant --- */
-    body, button, input, select, textarea{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      text-rendering: geometricPrecision;
-    }
-
-    /* "Pixel edges" feel */
+    /* Pixel-ish text */
     .px{
+      letter-spacing: .4px;
+      text-rendering: geometricPrecision;
       text-shadow:
-        1px 0 0 rgba(255,255,255,0.18),
-        -1px 0 0 rgba(0,0,0,0.10),
-        0 1px 0 rgba(255,255,255,0.15),
-        0 -1px 0 rgba(0,0,0,0.08);
-    }
-
-    /* --- DS Shell Layout --- */
-    .shellWrap{
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 26px 14px 40px;
-    }
-
-    .shell{
-      width: min(980px, 100%);
-      position:relative;
-      filter: drop-shadow(0 26px 35px rgba(0,0,0,0.30));
-    }
-
-    .dsBody{
-      position:relative;
-      background: linear-gradient(180deg, #1b1f2b, #0f1320);
-      border-radius: 28px;
-      padding: 24px 22px 18px;
-      border: 2px solid rgba(255,255,255,0.08);
-      box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.08),
-        inset 0 -2px 0 rgba(0,0,0,0.4);
-    }
-
-    /* Hinge illusion */
-    .hinge{
-      height: 16px;
-      margin: 14px auto 16px;
-      width: min(640px, 92%);
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(0,0,0,0.25));
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.55);
-      opacity:0.8;
-    }
-
-    .screens{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    @media (min-width: 860px){
-      .screens{
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .screen{
-      position:relative;
-      border-radius: 22px;
-      padding: 16px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.10), rgba(0,0,0,0.15));
-      border: 2px solid rgba(255,255,255,0.10);
-      box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.08),
-        inset 0 -2px 0 rgba(0,0,0,0.55);
-      overflow:hidden;
-    }
-
-    .screenInner{
-      position:relative;
-      border-radius: 16px;
-      overflow:hidden;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.05)),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 4px);
-      border: 2px solid rgba(0,0,0,0.18);
-      box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,0.10),
-        inset 0 14px 30px rgba(0,0,0,0.08);
-      min-height: 280px;
-    }
-
-    /* Checkerboard MKDS vibe */
-    .checker{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.12)),
-        conic-gradient(from 90deg, var(--gridA) 0 25%, transparent 0 50%, var(--gridA) 0 75%, transparent 0);
-      background-size: 24px 24px, 24px 24px;
-      background-position: 0 0, 0 0;
-    }
-
-    /* Scanlines overlay */
-    .scanlines::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        repeating-linear-gradient(
-          to bottom,
-          rgba(0,0,0,0.10) 0px,
-          rgba(0,0,0,0.10) 1px,
-          rgba(255,255,255,0.00) 2px,
-          rgba(255,255,255,0.00) 4px
-        );
-      mix-blend-mode: multiply;
-      opacity: 0.35;
-      transform: translateZ(0);
-    }
-
-    /* subtle noise */
-    .noise::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background-image:
-        radial-gradient(rgba(0,0,0,0.12) 1px, transparent 1px);
-      background-size: 8px 8px;
-      opacity: 0.06;
-      mix-blend-mode: multiply;
-    }
-
-    /* diagonal sparkle line like the DS glare in your photos */
-    .sparkleLine{
-      position:absolute;
-      left:-18%;
-      top:-10%;
-      width: 140%;
-      height: 140%;
-      pointer-events:none;
-      transform: rotate(-35deg);
-      opacity: 0.65;
-      filter: blur(0px);
-      background:
-        repeating-linear-gradient(90deg,
-          rgba(255,255,255,0.0) 0 10px,
-          rgba(255,255,255,0.45) 10px 12px,
-          rgba(255,255,255,0.0) 12px 22px
-        );
-      mask-image: linear-gradient(transparent, black 25%, black 75%, transparent);
+        1px 0 0 rgba(255,255,255,0.08),
+        -1px 0 0 rgba(0,0,0,0.08),
+        0 1px 0 rgba(255,255,255,0.06),
+        0 -1px 0 rgba(0,0,0,0.06);
     }
 
     /* ============================================================
-       TOP SCREEN CONTENT
+      Animated “pixel atmosphere” (new approach)
     ============================================================ */
-    .topHud{
-      position:absolute;
+    .bgFX{
+      position:fixed;
       inset:0;
-      padding: 18px 18px 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
+      pointer-events:none;
+      overflow:hidden;
     }
 
-    .mkTitleRow{
+    /* moving pixel grid */
+    .bgFX::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px) 0 0 / 18px 18px,
+        linear-gradient(0deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 18px 18px;
+      transform: rotate(12deg);
+      opacity:.18;
+      animation: driftGrid 22s linear infinite;
+      filter: blur(.2px);
+      mix-blend-mode: screen;
+    }
+
+    @keyframes driftGrid{
+      0%{ transform: translate3d(-4%, -2%, 0) rotate(12deg); }
+      100%{ transform: translate3d(4%, 3%, 0) rotate(12deg); }
+    }
+
+    /* pixel “stars” */
+    .stars{
+      position:absolute;
+      inset:0;
+      opacity:.55;
+      filter: blur(.0px);
+      mix-blend-mode: screen;
+    }
+    .star{
+      position:absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 0 12px rgba(68,240,255,.25);
+      animation: twinkle 2.6s infinite ease-in-out;
+      border-radius: 1px;
+    }
+    @keyframes twinkle{
+      0%,100%{ transform: scale(1); opacity:.55; }
+      50%{ transform: scale(1.7); opacity:1; }
+    }
+
+    /* scanline overlay (subtle; always on but gentle) */
+    .scan{
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,.10) 0px,
+        rgba(0,0,0,.10) 1px,
+        rgba(255,255,255,0) 3px,
+        rgba(255,255,255,0) 6px
+      );
+      opacity:.18;
+      mix-blend-mode: multiply;
+    }
+
+    /* floating neon blobs */
+    .blob{
+      position:absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 999px;
+      filter: blur(34px);
+      opacity:.18;
+      animation: blob 9s ease-in-out infinite alternate;
+    }
+    .blob.b1{ left:-120px; top:-140px; background: var(--neon1); animation-duration: 10.5s; }
+    .blob.b2{ right:-160px; top:40px; background: var(--neon4); animation-duration: 12.5s; }
+    .blob.b3{ left:20%; bottom:-190px; background: var(--neon2); animation-duration: 11.2s; }
+    @keyframes blob{
+      0%{ transform: translate3d(0,0,0) scale(1); }
+      100%{ transform: translate3d(40px, 30px, 0) scale(1.12); }
+    }
+
+    /* ============================================================
+      HUB LAYOUT (Fullscreen)
+    ============================================================ */
+    .hub{
+      position:relative;
+      height:100%;
+      padding: 26px 22px;
+      display:grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      z-index:1;
+    }
+
+    .topBar{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .mkLogo{
+    .brand{
       display:flex;
       flex-direction:column;
-      gap: 6px;
-      min-width: 260px;
+      gap: 8px;
+      min-width: 280px;
     }
 
-    .mkLogo .big{
-      font-size: 24px;
-      line-height: 1.05;
-      color: #f5fbff;
+    .brandTitle{
+      font-size: 18px;
+      color: rgba(255,255,255,.92);
       letter-spacing: 1px;
-      text-shadow:
-        0 2px 0 rgba(0,0,0,0.25),
-        2px 2px 0 rgba(0,0,0,0.22);
+      line-height:1.15;
     }
 
-    .mkLogo .sub{
+    .brandSub{
       font-size: 12px;
-      opacity: 0.9;
-      color: rgba(0,0,0,0.78);
-      background: rgba(255,255,255,0.7);
-      display:inline-block;
-      padding: 4px 8px;
-      border-radius: 10px;
-      border: 1px solid rgba(0,0,0,0.12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+      color: rgba(255,255,255,.82);
+      opacity:.92;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
       width: fit-content;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 8px 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      backdrop-filter: blur(6px);
     }
 
-    .statusPanel{
-      flex: 1;
-      min-width: 220px;
+    .statRow{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
-      gap: 8px;
+      gap: 10px;
+      min-width: 220px;
     }
 
     .chip{
+      user-select:none;
       font-size: 12px;
-      color: rgba(0,0,0,0.85);
-      background: rgba(255,255,255,0.72);
-      border: 1px solid rgba(0,0,0,0.16);
-      border-radius: 12px;
-      padding: 6px 10px;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.65),
-        0 3px 10px rgba(0,0,0,0.08);
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 8px 10px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.22);
       display:flex;
       align-items:center;
-      gap: 8px;
-      max-width: 100%;
-      user-select:none;
+      gap: 10px;
     }
 
     .dot{
-      width: 10px; height: 10px; border-radius: 2px;
-      background: linear-gradient(180deg, #fff, #b9dfff);
-      border: 1px solid rgba(0,0,0,0.22);
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.16);
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.15));
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 0 18px rgba(68,240,255,.22);
     }
 
-    .progressBar{
-      width: min(420px, 100%);
-      height: 14px;
+    .bar{
+      width: min(340px, 56vw);
+      height: 12px;
       border-radius: 999px;
-      background: rgba(0,0,0,0.14);
-      border: 1px solid rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.28);
       overflow:hidden;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
     }
-    .progressFill{
+    .fill{
       height:100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), #86ffb9);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
-      transition: width 380ms cubic-bezier(.2,.9,.2,1);
+      width:0%;
+      background: linear-gradient(90deg, var(--neon1), var(--neon2));
+      box-shadow: 0 0 18px rgba(68,240,255,.30);
+      transition: width 420ms cubic-bezier(.2,.9,.2,1);
     }
 
-    .topCard{
-      margin-top: 6px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .infoCard{
-      background: rgba(255,255,255,0.75);
-      border: 1px solid rgba(0,0,0,0.14);
-      border-radius: 16px;
-      padding: 12px 12px;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.65),
-        0 8px 16px rgba(0,0,0,0.08);
-    }
-
-    .infoTitle{
+    .controls{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
       gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .infoTitle h2{
-      margin:0;
-      font-size: 14px;
-      color: rgba(0,0,0,0.85);
-    }
-
-    .tinyHelp{
-      font-size: 11px;
-      opacity: 0.85;
-      white-space: nowrap;
-    }
-
-    .previewBox{
-      border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.14);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.25));
-      padding: 10px;
-      min-height: 110px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .previewTitle{
-      font-size: 14px;
-      margin: 0 0 8px 0;
-      color: rgba(0,0,0,0.88);
-    }
-
-    .previewText{
-      font-size: 12px;
-      line-height: 1.5;
-      margin:0;
-      color: rgba(0,0,0,0.82);
-      white-space: pre-wrap;
-    }
-
-    .hintKeys{
-      margin-top: 8px;
-      font-size: 11px;
-      opacity:0.9;
-      color: rgba(0,0,0,0.78);
-      display:flex;
       flex-wrap:wrap;
-      gap: 8px 12px;
+      justify-content:flex-end;
     }
 
-    .kbd{
-      border: 1px solid rgba(0,0,0,0.2);
+    .btnSmall{
+      font-family: var(--mono);
+      font-weight: 800;
+      font-size: 12px;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
       border-bottom-width: 2px;
-      background: rgba(255,255,255,0.85);
-      border-radius: 8px;
-      padding: 2px 6px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
-    }
-
-    /* ============================================================
-       BOTTOM SCREEN MENU
-    ============================================================ */
-    .bottomHud{
-      position:absolute;
-      inset:0;
-      padding: 14px 14px 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-    }
-
-    .modeHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 2px 2px 0;
-    }
-
-    .modeHeader .title{
-      font-size: 20px;
-      line-height: 1;
-      color: var(--title);
-      letter-spacing: 1px;
-      text-shadow:
-        2px 2px 0 rgba(0,0,0,0.45),
-        0 2px 0 rgba(0,0,0,0.25),
-        -2px 0 0 rgba(0,0,0,0.25);
-      -webkit-text-stroke: 1px rgba(0,0,0,0.25);
-      user-select:none;
-    }
-
-    .modeHeader .mini{
-      font-size: 11px;
-      opacity: 0.9;
-      color: rgba(0,0,0,0.78);
-      background: rgba(255,255,255,0.65);
-      border: 1px solid rgba(0,0,0,0.14);
-      border-radius: 12px;
-      padding: 6px 10px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-      user-select:none;
-    }
-
-    .menu{
-      margin: 2px 0 0;
-      padding: 0;
-      list-style:none;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      flex: 1;
-      overflow:auto;
-      scrollbar-width: thin;
-    }
-
-    .menu::-webkit-scrollbar{ width: 10px; }
-    .menu::-webkit-scrollbar-thumb{
-      background: rgba(0,0,0,0.18);
-      border-radius: 999px;
-      border: 2px solid rgba(255,255,255,0.35);
-    }
-
-    .menuItem{
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 12px 12px;
+      border-radius: 14px;
+      padding: 8px 10px;
       cursor:pointer;
       user-select:none;
-      outline:none;
-
-      /* MKDS-ish blue bevel bar */
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06)),
-        linear-gradient(180deg, var(--mid2), var(--mid));
-      border-radius: 14px;
-      border: 2px solid rgba(0,0,0,0.25);
-      box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.22),
-        inset 0 -2px 0 rgba(0,0,0,0.35),
-        0 10px 18px rgba(0,0,0,0.12);
-      transform: translateZ(0);
-      transition: transform 110ms ease, filter 110ms ease;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 26px rgba(0,0,0,.22);
+      transition: transform 120ms ease, filter 120ms ease;
     }
+    .btnSmall:active{ transform: translateY(1px); filter: brightness(.98); }
 
-    .menuItem:active{
-      transform: translateY(1px);
-      filter: brightness(0.98);
-    }
-
-    .menuItem .left{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .iconBox{
-      width: 34px;
-      height: 26px;
-      border-radius: 10px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.35), rgba(0,0,0,0.12)),
-        linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.02));
-      border: 1px solid rgba(0,0,0,0.18);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
-      display:grid;
-      place-items:center;
-      flex: 0 0 auto;
-    }
-
-    .icon{
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      background: rgba(255,255,255,0.75);
-      border: 1px solid rgba(0,0,0,0.22);
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.14);
+    /* ============================================================
+      Icon Grid (no scroll)
+      9 items => 3x3 grid (auto adapts)
+    ============================================================ */
+    .gridWrap{
       position:relative;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 26px 60px rgba(0,0,0,.30);
+      padding: 18px;
+      overflow:hidden;
     }
 
-    /* tiny pixel symbol lines */
-    .icon::after{
+    .gridWrap::before{
       content:"";
       position:absolute;
-      inset:4px 4px;
+      inset:-20%;
       background:
-        linear-gradient(90deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)) 0 0 / 100% 2px no-repeat,
-        linear-gradient(90deg, rgba(0,0,0,0.45), rgba(0,0,0,0.45)) 0 6px / 80% 2px no-repeat,
-        linear-gradient(90deg, rgba(0,0,0,0.35), rgba(0,0,0,0.35)) 0 12px / 60% 2px no-repeat;
-      opacity:0.9;
+        radial-gradient(420px 320px at 30% 40%, rgba(68,240,255,.18), transparent 60%),
+        radial-gradient(420px 320px at 70% 60%, rgba(255,77,154,.14), transparent 60%),
+        radial-gradient(420px 320px at 50% 10%, rgba(122,255,102,.14), transparent 60%);
+      filter: blur(22px);
+      opacity:.85;
+      animation: breathe 6.5s ease-in-out infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes breathe{
+      0%{ transform: scale(1) translateY(0); }
+      100%{ transform: scale(1.06) translateY(-6px); }
     }
 
-    .label{
-      min-width:0;
+    .grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      height: 100%;
+    }
+
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px){
+      .grid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      .brand{ min-width: 0; }
+      .bar{ width: 60vw; }
+    }
+
+    /* tile */
+    .tile{
+      position:relative;
       display:flex;
       flex-direction:column;
-      gap: 2px;
-    }
-
-    .label .main{
-      font-size: 16px;
-      color: #f4fbff;
-      letter-spacing: 0.8px;
-      text-shadow:
-        2px 2px 0 rgba(0,0,0,0.35);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .label .sub{
-      font-size: 11px;
-      color: rgba(255,255,255,0.85);
-      opacity:0.95;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .right{
-      display:flex;
-      align-items:center;
+      justify-content:space-between;
       gap: 10px;
-      flex: 0 0 auto;
-    }
 
-    .badge{
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.70);
-      border: 1px solid rgba(0,0,0,0.18);
-      color: rgba(0,0,0,0.82);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-    }
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      cursor:pointer;
+      user-select:none;
 
-    .check{
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.70);
-      border: 2px solid rgba(0,0,0,0.18);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-      display:grid;
-      place-items:center;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .check svg{
-      width: 16px;
-      height: 16px;
-      opacity: 0.0;
-      transform: scale(0.8);
-      transition: opacity 140ms ease, transform 180ms cubic-bezier(.2,.9,.2,1);
-    }
-    .checked .check svg{
-      opacity: 1;
-      transform: scale(1.0);
-    }
-
-    /* focus highlight like DS menu selection */
-    .menuItem.isFocus{
-      outline:none;
-      box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.22),
-        inset 0 -2px 0 rgba(0,0,0,0.35),
-        0 10px 18px rgba(0,0,0,0.12),
-        0 0 0 3px rgba(255,255,255,0.35),
-        0 0 0 6px rgba(47,241,255,0.30),
-        0 0 24px rgba(47,241,255,0.25);
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08)),
-        linear-gradient(180deg, var(--lite), var(--mid2));
-      transform: translateY(-1px);
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow:
+        0 18px 36px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.10);
+      overflow:hidden;
+      transform: translateZ(0);
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
     }
 
-    /* footer controls */
-    .footerRow{
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(220px 160px at 20% 20%, rgba(68,240,255,.20), transparent 60%),
+        radial-gradient(220px 160px at 80% 80%, rgba(255,206,77,.14), transparent 60%);
+      opacity:.55;
+      filter: blur(10px);
+      pointer-events:none;
+      transition: opacity 160ms ease;
+    }
+
+    .tile:hover{
+      transform: translateY(-3px);
+      border-color: rgba(68,240,255,.35);
+      box-shadow:
+        0 22px 42px rgba(0,0,0,.28),
+        0 0 0 3px rgba(68,240,255,.12),
+        inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .tile:hover::before{ opacity:.85; }
+
+    .tile:active{
+      transform: translateY(-1px) scale(.995);
+      filter: brightness(.99);
+    }
+
+    .tileTop{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 10px;
-      margin-top: 2px;
-      padding: 4px 2px 0;
-      user-select:none;
+      position:relative;
+      z-index:1;
     }
 
-    .footBtn{
+    .iconBadge{
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.22);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.06));
+      box-shadow:
+        0 12px 26px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.18);
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .iconBadge::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,.0) 0 10px,
+        rgba(255,255,255,.10) 10px 12px,
+        rgba(255,255,255,.0) 12px 22px
+      );
+      opacity:.40;
+      transform: rotate(-20deg) translateX(-30%);
+    }
+
+    .iconSVG{
+      width: 34px;
+      height: 34px;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,.25));
+    }
+
+    /* completion stamp */
+    .stamp{
       display:inline-flex;
       align-items:center;
       gap: 8px;
-      border: 1px solid rgba(0,0,0,0.18);
-      border-bottom-width: 2px;
-      background: rgba(255,255,255,0.72);
-      border-radius: 14px;
-      padding: 8px 10px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
-      cursor:pointer;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.18);
+      color: rgba(255,255,255,.90);
       font-size: 12px;
-      transition: transform 90ms ease, filter 90ms ease;
+      white-space:nowrap;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 24px rgba(0,0,0,.20);
     }
-    .footBtn:active{ transform: translateY(1px); filter: brightness(0.98); }
+    .stamp .miniDot{
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 0 18px rgba(68,240,255,.20);
+    }
+    .done .stamp{
+      background: rgba(122,255,102,.14);
+      border-color: rgba(122,255,102,.30);
+      box-shadow: 0 0 0 3px rgba(122,255,102,.10), 0 10px 26px rgba(0,0,0,.22);
+    }
+    .done .stamp .miniDot{
+      background: rgba(122,255,102,.85);
+      box-shadow: 0 0 18px rgba(122,255,102,.35);
+    }
 
-    .arrowBack{
-      width: 18px;
-      height: 18px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.75);
-      border: 1px solid rgba(0,0,0,0.20);
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.12);
-      display:grid;
-      place-items:center;
+    .tileTitle{
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+    .tileTitle .t{
+      font-size: 16px;
+      color: rgba(255,255,255,.94);
+      letter-spacing: .8px;
+      line-height:1.1;
+    }
+    .tileTitle .s{
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+      opacity:.95;
+      line-height:1.25;
+    }
+
+    .tileHint{
+      position:relative;
+      z-index:1;
+      margin-top: 6px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+      opacity:.92;
+    }
+
+    .kbd{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 2px 7px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.20);
+      background: rgba(0,0,0,.20);
+      color: rgba(255,255,255,.92);
+      font-size: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+      margin-left: 6px;
+    }
+
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      padding: 6px 2px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      opacity:.95;
     }
 
     /* ============================================================
-       MODAL / DIALOG (OK / ABBRECHEN)
+      POPUP “SEITE”
     ============================================================ */
     .overlay{
       position:fixed;
       inset:0;
-      background: rgba(7,12,20,0.56);
       display:none;
       align-items:center;
       justify-content:center;
       padding: 18px;
+      background: rgba(0,0,0,.62);
       z-index: 9999;
     }
     .overlay.show{ display:flex; }
 
-    .dialog{
-      width: min(820px, 100%);
-      border-radius: 20px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72));
-      border: 2px solid rgba(0,0,0,0.22);
-      box-shadow:
-        0 28px 60px rgba(0,0,0,0.35),
-        inset 0 1px 0 rgba(255,255,255,0.65);
+    .modal{
+      width: min(980px, 100%);
+      height: min(680px, 86vh);
+      border-radius: 26px;
+      position:relative;
       overflow:hidden;
-      transform: translateY(10px) scale(0.98);
+      transform: translateY(14px) scale(.985);
       opacity: 0;
-      animation: popIn 190ms cubic-bezier(.2,.9,.2,1) forwards;
-      position:relative;
+      animation: pop 210ms cubic-bezier(.2,.9,.2,1) forwards;
+      box-shadow: 0 40px 90px rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+    }
+    @keyframes pop{
+      to{ transform: translateY(0) scale(1); opacity:1; }
     }
 
-    @keyframes popIn{
-      to { transform: translateY(0) scale(1); opacity: 1; }
-    }
-
-    .dialogTop{
-      padding: 14px 16px 10px;
+    .modalFX{
+      position:absolute;
+      inset:-25%;
       background:
-        linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02)),
-        linear-gradient(180deg, var(--mid2), var(--mid));
-      border-bottom: 2px solid rgba(0,0,0,0.22);
-      position:relative;
+        radial-gradient(520px 420px at 25% 25%, rgba(68,240,255,.22), transparent 60%),
+        radial-gradient(520px 420px at 75% 75%, rgba(255,77,154,.16), transparent 60%),
+        radial-gradient(520px 420px at 55% 20%, rgba(255,206,77,.14), transparent 60%);
+      filter: blur(26px);
+      opacity:.95;
+      animation: breathe 6s ease-in-out infinite alternate;
+      pointer-events:none;
     }
 
-    .dialogTopTitle{
+    .modalInner{
+      position:relative;
+      z-index:1;
+      height:100%;
+      display:grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .modalHeader{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 14px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .modalTitle{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      min-width:0;
+    }
+
+    .modalTitle .h{
       margin:0;
       font-size: 18px;
-      color: #f4fbff;
+      color: rgba(255,255,255,.95);
       letter-spacing: 1px;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
-    }
-
-    .dialogBody{
-      padding: 14px 16px 16px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.62));
-      position:relative;
-    }
-
-    .dialogText{
-      font-size: 13px;
-      line-height: 1.6;
-      color: rgba(0,0,0,0.88);
-      white-space: pre-wrap;
-      margin: 0;
-    }
-
-    .dialogImageRow{
-      margin-top: 12px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .imgBox{
-      border: 1px solid rgba(0,0,0,0.18);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.75);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+      line-height:1.15;
+      white-space: nowrap;
       overflow:hidden;
+      text-overflow: ellipsis;
     }
 
-    .imgBox img{
-      width:100%;
-      height:auto;
-      display:block;
-      image-rendering: pixelated;
-    }
-
-    .imgTools{
+    .modalTitle .meta{
       display:flex;
       align-items:center;
-      justify-content:space-between;
       gap: 10px;
-      padding: 10px;
-      border-top: 1px solid rgba(0,0,0,0.12);
+      flex-wrap:wrap;
+      color: rgba(255,255,255,.82);
+      font-size: 12px;
+      opacity:.95;
     }
 
-    .btnMini{
+    .pill{
       display:inline-flex;
       align-items:center;
       gap: 8px;
-      font-size: 12px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.18);
-      border-bottom-width: 2px;
-      background: rgba(255,255,255,0.72);
-      cursor:pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
-      transition: transform 90ms ease, filter 90ms ease;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
       user-select:none;
     }
-    .btnMini:active{ transform: translateY(1px); filter: brightness(0.98); }
+    .pill .pDot{
+      width: 10px; height: 10px; border-radius: 3px;
+      background: rgba(255,255,255,.70);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 0 18px rgba(68,240,255,.25);
+    }
 
-    .dialogBottom{
+    .closeX{
+      cursor:pointer;
+      user-select:none;
+      border-radius: 16px;
+      padding: 8px 10px;
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 12px 24px rgba(0,0,0,.20);
+      transition: transform 120ms ease, filter 120ms ease;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .closeX:active{ transform: translateY(1px); filter: brightness(.98); }
+
+    .modalBody{
+      position:relative;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      box-shadow:
+        0 18px 44px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 1fr;
+      align-items:stretch;
+    }
+
+    /* type area */
+    .typeArea{
+      position:relative;
+      height:100%;
+      display:grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .typeTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      color: rgba(255,255,255,.85);
+      font-size: 12px;
+      opacity:.95;
+    }
+
+    .typeBox{
+      border-radius: 18px;
+      background: rgba(255,255,255,.88);
+      border: 2px solid rgba(0,0,0,.18);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.65);
+      padding: 14px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* pixel paper texture */
+    .typeBox::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65)),
+        radial-gradient(rgba(0,0,0,.08) 1px, transparent 1px);
+      background-size: auto, 9px 9px;
+      opacity:.22;
+      pointer-events:none;
+      mix-blend-mode: multiply;
+    }
+
+    .typed{
+      position:relative;
+      z-index:1;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.65;
+      color: rgba(0,0,0,.90);
+    }
+
+    /* birthday twins image (square) */
+    .imgRow{
+      margin-top: 12px;
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      position:relative;
+      z-index:1;
+    }
+    .squareImg{
+      width: 180px;
+      height: 180px;
+      border-radius: 16px;
+      border: 2px solid rgba(0,0,0,.18);
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 18px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.6);
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    .squareImg img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      display:block;
+    }
+
+    .modalFooter{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 12px 6px 4px;
+    }
+
+    .footerLeft{
+      color: rgba(255,255,255,.80);
+      font-size: 12px;
+      opacity:.95;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .footerRight{
       display:flex;
       gap: 10px;
-      justify-content:flex-end;
-      padding: 12px 12px;
-      border-top: 2px solid rgba(0,0,0,0.14);
-      background: rgba(255,255,255,0.72);
+      align-items:center;
     }
 
     .btn{
-      min-width: 120px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 2px solid rgba(0,0,0,0.22);
-      border-bottom-width: 3px;
-      background: rgba(255,255,255,0.85);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      font-family: var(--mono);
+      font-weight: 900;
+      letter-spacing: .6px;
+      font-size: 12px;
+      color: rgba(0,0,0,.90);
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.18);
+      border-bottom-width: 2px;
+      border-radius: 16px;
+      padding: 10px 14px;
       cursor:pointer;
       user-select:none;
-      font-size: 13px;
+      box-shadow: 0 18px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.65);
+      transition: transform 120ms ease, filter 120ms ease;
+      min-width: 120px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap: 10px;
-      transition: transform 90ms ease, filter 90ms ease;
     }
-    .btn:active{ transform: translateY(1px); filter: brightness(0.98); }
+    .btn:active{ transform: translateY(1px); filter: brightness(.99); }
 
-    .btnOK{
-      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.65)),
-                  linear-gradient(180deg, rgba(45,245,166,0.75), rgba(45,245,166,0.45));
-    }
-
-    .btnCancel{
-      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.65)),
-                  linear-gradient(180deg, rgba(255,94,126,0.55), rgba(255,94,126,0.35));
+    .btnPrimary{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82)),
+        linear-gradient(180deg, rgba(68,240,255,.25), rgba(68,240,255,.10));
+      color: rgba(0,0,0,.92);
     }
 
-    /* Thinking overlay inside dialog */
+    .btnGhost{
+      color: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-bottom-width: 2px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* Thinking overlay inside modal */
     .thinking{
       position:absolute;
       inset:0;
       display:none;
       align-items:center;
       justify-content:center;
-      background: rgba(255,255,255,0.68);
-      backdrop-filter: blur(2px);
-      z-index: 3;
+      background: rgba(0,0,0,.40);
+      z-index: 5;
     }
     .thinking.show{ display:flex; }
 
-    .thinkBox{
-      border-radius: 16px;
-      border: 2px solid rgba(0,0,0,0.18);
-      background: rgba(255,255,255,0.88);
-      box-shadow:
-        0 18px 30px rgba(0,0,0,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.7);
-      padding: 14px 16px;
+    .thinkCard{
+      width: min(340px, 88%);
+      border-radius: 20px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 30px 70px rgba(0,0,0,.40);
+      padding: 16px;
+      color: rgba(255,255,255,.92);
       text-align:center;
-      width: min(360px, 92%);
     }
-
-    .thinkTitle{
-      margin:0 0 6px 0;
+    .thinkCard .t1{
       font-size: 14px;
-      color: rgba(0,0,0,0.88);
+      margin:0 0 6px 0;
+      letter-spacing: .9px;
     }
-
+    .thinkCard .t2{
+      font-size: 12px;
+      opacity:.88;
+      margin:0;
+    }
     .dots{
       display:flex;
       justify-content:center;
-      gap: 6px;
-      margin-top: 10px;
+      gap: 8px;
+      margin-top: 12px;
     }
-    .dotPulse{
-      width: 10px;
-      height: 10px;
-      border-radius: 4px;
-      background: rgba(0,0,0,0.25);
-      animation: pulse 650ms infinite ease-in-out;
+    .dp{
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 18px rgba(68,240,255,.25);
+      animation: dp 700ms infinite ease-in-out;
     }
-    .dotPulse:nth-child(2){ animation-delay: 120ms; }
-    .dotPulse:nth-child(3){ animation-delay: 240ms; }
-
-    @keyframes pulse{
-      0%,100%{ transform: translateY(0); opacity:0.35; }
-      50%{ transform: translateY(-4px); opacity:0.8; }
+    .dp:nth-child(2){ animation-delay: 120ms; }
+    .dp:nth-child(3){ animation-delay: 240ms; }
+    @keyframes dp{
+      0%,100%{ transform: translateY(0); opacity:.55; }
+      50%{ transform: translateY(-6px); opacity:1; }
     }
 
     /* ============================================================
-       VICTORY OVERLAY
+      Victory Overlay
     ============================================================ */
     .victory{
       position:fixed;
@@ -876,329 +875,343 @@
       align-items:center;
       justify-content:center;
       padding: 18px;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,.72);
       z-index: 10000;
     }
     .victory.show{ display:flex; }
 
-    .victoryCard{
-      width: min(820px, 100%);
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.72));
-      border: 2px solid rgba(0,0,0,0.22);
-      box-shadow:
-        0 30px 70px rgba(0,0,0,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.7);
+    .vicCard{
+      width: min(980px, 100%);
+      height: min(620px, 84vh);
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 44px 110px rgba(0,0,0,.55);
       overflow:hidden;
       position:relative;
     }
 
-    .victoryTop{
-      padding: 16px;
+    .vicFX{
+      position:absolute;
+      inset:-25%;
       background:
-        linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02)),
-        linear-gradient(180deg, #2b7cff, #155bb5);
-      border-bottom: 2px solid rgba(0,0,0,0.22);
+        radial-gradient(520px 520px at 20% 30%, rgba(122,255,102,.22), transparent 60%),
+        radial-gradient(520px 520px at 80% 40%, rgba(68,240,255,.18), transparent 60%),
+        radial-gradient(520px 520px at 50% 85%, rgba(255,206,77,.16), transparent 60%);
+      filter: blur(28px);
+      opacity:.95;
+      animation: breathe 6s ease-in-out infinite alternate;
+      pointer-events:none;
     }
-    .victoryTop h2{
+
+    .vicInner{
+      position:relative;
+      z-index:1;
+      height:100%;
+      display:grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .vicTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 14px 12px;
+      border-radius: 22px;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .vicTop h2{
       margin:0;
-      font-size: 20px;
-      color: #f4fbff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+      font-size: 18px;
+      color: rgba(255,255,255,.95);
       letter-spacing: 1px;
     }
 
-    .victoryBody{
-      padding: 14px 16px 16px;
+    .vicBody{
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 24px 60px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.08);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      padding: 16px;
       position:relative;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.62));
     }
 
-    .laurel{
-      width: 100%;
-      display:flex;
-      justify-content:center;
-      margin: 10px 0 8px;
-      opacity:0.95;
-    }
-
-    .victoryText{
-      margin: 0;
-      font-size: 14px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      color: rgba(0,0,0,0.88);
+    .vicPaper{
+      width: min(720px, 96%);
+      border-radius: 22px;
+      background: rgba(255,255,255,.92);
+      border: 2px solid rgba(0,0,0,.18);
+      box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.65);
+      padding: 18px;
       text-align:center;
+      position:relative;
+      overflow:hidden;
     }
 
-    .victoryBottom{
+    .vicPaper::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(rgba(0,0,0,.08) 1px, transparent 1px);
+      background-size: 10px 10px;
+      opacity:.18;
+      mix-blend-mode: multiply;
+      pointer-events:none;
+    }
+
+    .vicMsg{
+      position:relative;
+      z-index:1;
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      color: rgba(0,0,0,.92);
+      margin: 0;
+    }
+
+    .vicImg{
+      margin: 14px auto 0;
+      width: 180px;
+      height: 180px;
+      border-radius: 18px;
+      border: 2px solid rgba(0,0,0,.18);
+      overflow:hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.6);
+      background: rgba(255,255,255,.96);
+      display:none; /* only show if cup.png loads */
+      position:relative;
+      z-index:1;
+    }
+    .vicImg img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      display:block;
+    }
+
+    .vicBottom{
       display:flex;
       justify-content:space-between;
-      gap: 10px;
-      padding: 12px 12px;
-      border-top: 2px solid rgba(0,0,0,0.14);
-      background: rgba(255,255,255,0.72);
       align-items:center;
-    }
-
-    .resetWarn{
+      gap: 12px;
+      padding: 10px 4px 0;
+      color: rgba(255,255,255,.80);
       font-size: 12px;
-      opacity:0.85;
+      opacity:.95;
     }
 
-    .confetti{
+    /* confetti canvas */
+    #confetti{
       position:absolute;
       inset:0;
       pointer-events:none;
-      opacity:0.95;
+      opacity:.95;
     }
 
     /* ============================================================
-       MINI-GAME (Pilz-Cup)
+      GAME CANVAS (Pilz-Cup)
     ============================================================ */
-    .gameWrap{
-      border: 1px solid rgba(0,0,0,0.18);
-      border-radius: 16px;
-      background: rgba(255,255,255,0.72);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
-      overflow:hidden;
-      margin-top: 10px;
+    .gameArea{
+      position:relative;
+      z-index:1;
+      margin-top: 12px;
+      display:grid;
+      grid-template-rows: auto auto;
+      gap: 10px;
     }
-
-    .gameTopRow{
+    .gameStats{
       display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      padding: 10px 10px 8px;
-      border-bottom: 1px solid rgba(0,0,0,0.12);
-    }
-    .gameTopRow .gTitle{
       font-size: 12px;
-      opacity:0.9;
+      color: rgba(0,0,0,.85);
+      position:relative;
+      z-index:1;
     }
-    .gameTopRow .gStats{
-      font-size: 12px;
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      opacity:0.95;
-    }
-    .statChip{
-      padding: 4px 8px;
+    .gChip{
+      padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.80);
-      border: 1px solid rgba(0,0,0,0.16);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      background: rgba(255,255,255,.90);
+      border: 1px solid rgba(0,0,0,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+      white-space:nowrap;
     }
 
-    canvas#game{
+    canvas#jumpGame{
       width: 100%;
-      height: 320px;
-      display:block;
-      image-rendering: pixelated;
+      height: 300px;
+      border-radius: 18px;
+      border: 2px solid rgba(0,0,0,.18);
       background:
-        linear-gradient(180deg, #bfe6ff, #87cfff);
+        linear-gradient(180deg, #e9f6ff, #cfeaff);
+      box-shadow: 0 24px 60px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.65);
+      image-rendering: pixelated;
+      display:block;
     }
 
-    .gameHelp{
-      padding: 10px;
+    .gameHint{
       font-size: 12px;
-      line-height: 1.5;
-      border-top: 1px solid rgba(0,0,0,0.12);
-      background: rgba(255,255,255,0.76);
+      color: rgba(0,0,0,.86);
+      opacity:.95;
+      line-height:1.55;
+      position:relative;
+      z-index:1;
     }
 
     /* ============================================================
-       UTILS
+      Focus outlines (keyboard)
     ============================================================ */
-    .hidden{ display:none !important; }
-    .srOnly{
-      position:absolute; width:1px; height:1px;
-      padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0;
+    .tile:focus-visible,
+    .btn:focus-visible,
+    .btnSmall:focus-visible,
+    .closeX:focus-visible{
+      outline: 3px solid rgba(68,240,255,.55);
+      outline-offset: 3px;
     }
-
-    /* Small gentle entrance */
-    .fadeIn{
-      animation: fadeIn 240ms ease-out forwards;
-    }
-    @keyframes fadeIn{
-      from{ opacity:0; transform: translateY(6px); }
-      to{ opacity:1; transform: translateY(0); }
-    }
-
   </style>
 </head>
 
 <body>
-  <div class="shellWrap">
-    <div class="shell">
-      <div class="dsBody">
+  <div class="bgFX" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
 
-        <!-- TOP SCREEN -->
-        <div class="screen">
-          <div class="screenInner checker scanlines noise">
-            <div class="sparkleLine"></div>
-
-            <div class="topHud">
-              <div class="mkTitleRow">
-                <div class="mkLogo px">
-                  <div class="big">MARIOKART DS<br>GIFT MENU</div>
-                  <div class="sub px">Nostalgie-One-Sider • Pixel • Sounds • OK/Abbrechen</div>
-                </div>
-
-                <div class="statusPanel">
-                  <div class="chip px" id="chipProgress">
-                    <span class="dot"></span>
-                    <span id="progressText">Fortschritt: 0 / 0</span>
-                  </div>
-
-                  <div class="progressBar" aria-label="Fortschrittsbalken">
-                    <div class="progressFill" id="progressFill"></div>
-                  </div>
-
-                  <div class="chip px" id="chipSound">
-                    <span class="dot"></span>
-                    <span id="soundText">Sound: AN</span>
-                  </div>
-
-                  <div class="chip px" id="chipScan">
-                    <span class="dot"></span>
-                    <span id="scanText">Scanlines: AN</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="topCard">
-                <div class="infoCard fadeIn">
-                  <div class="infoTitle">
-                    <h2 class="px">Vorschau / Story Log</h2>
-                    <div class="tinyHelp px">Tip: klick unten was an</div>
-                  </div>
-
-                  <div class="previewBox">
-                    <h3 class="previewTitle px" id="previewTitle">Wähle einen Insider…</h3>
-                    <p class="previewText px" id="previewText">
-Hier oben siehst du immer, was du gerade anwählst.
-Unten ist das Menü wie bei Mario Kart DS.
-
-Wenn du was öffnest:
-→ Popup kommt
-→ OK = abgehakt
-→ Wenn alles abgehakt ist: Cup gewonnen
-                    </p>
-
-                    <div class="hintKeys px">
-                      <span><span class="kbd">↑</span><span class="kbd">↓</span> navigieren</span>
-                      <span><span class="kbd">Enter</span> / <span class="kbd">A</span> öffnen/OK</span>
-                      <span><span class="kbd">Esc</span> / <span class="kbd">B</span> zurück</span>
-                      <span><span class="kbd">M</span> Sound</span>
-                      <span><span class="kbd">L</span> Scanlines</span>
-                      <span><span class="kbd">R</span> Reset</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="hinge"></div>
-
-        <!-- BOTTOM SCREEN -->
-        <div class="screen">
-          <div class="screenInner checker scanlines noise" id="bottomScreen">
-            <div class="sparkleLine"></div>
-
-            <div class="bottomHud">
-              <div class="modeHeader">
-                <div class="title px">MODUS WÄHLEN</div>
-                <div class="mini px" id="miniTip">OK = abgehakt • Abbrechen = schließen</div>
-              </div>
-
-              <ul class="menu" id="menu" role="listbox" aria-label="Insider Menü">
-                <!-- injected by JS -->
-              </ul>
-
-              <div class="footerRow">
-                <div class="footBtn px" id="btnReset" title="Fortschritt zurücksetzen (R)">
-                  <span class="arrowBack" aria-hidden="true">↺</span>
-                  Reset
-                </div>
-
-                <div style="display:flex; gap:10px; align-items:center;">
-                  <div class="footBtn px" id="btnToggleSound" title="Sound an/aus (M)">
-                    <span class="arrowBack" aria-hidden="true">♪</span>
-                    Sound
-                  </div>
-                  <div class="footBtn px" id="btnToggleScan" title="Scanlines an/aus (L)">
-                    <span class="arrowBack" aria-hidden="true">≋</span>
-                    Scan
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
+    <div class="stars" id="stars"></div>
+    <div class="scan"></div>
   </div>
 
-  <!-- DIALOG OVERLAY -->
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
-      <div class="dialogTop">
-        <div class="dialogTopTitle px" id="dlgTitle">Titel</div>
+  <!-- HUB -->
+  <main class="hub px" id="hub">
+    <header class="topBar">
+      <div class="brand">
+        <div class="brandTitle">MKDS NOSTALGIE — GIFT HUB</div>
+        <div class="brandSub">
+          <span>Icons klicken → Popup</span>
+          <span>•</span>
+          <span>Weiter/Beenden</span>
+          <span>•</span>
+          <span>Typewriter</span>
+        </div>
       </div>
 
-      <div class="dialogBody" id="dlgBody">
-        <p class="dialogText px" id="dlgText"></p>
+      <div class="statRow">
+        <div class="chip">
+          <span class="dot"></span>
+          <span id="progText">Fortschritt: 0 / 0</span>
+        </div>
+        <div class="bar" aria-label="Fortschrittsbalken">
+          <div class="fill" id="progFill"></div>
+        </div>
+        <div class="controls">
+          <button class="btnSmall px" id="btnSound" type="button" title="Sound an/aus (M)">Sound: <span id="soundLabel">AN</span></button>
+          <button class="btnSmall px" id="btnReset" type="button" title="Reset (R)">Reset</button>
+        </div>
+      </div>
+    </header>
 
-        <!-- optional image area -->
-        <div class="dialogImageRow" id="dlgImageRow"></div>
+    <section class="gridWrap" aria-label="Insider Hub">
+      <div class="grid" id="grid">
+        <!-- tiles injected by JS -->
+      </div>
+    </section>
 
-        <!-- game area -->
-        <div class="gameWrap hidden" id="gameWrap">
-          <div class="gameTopRow px">
-            <div class="gTitle">Pilz-Cup: Endlos-Runner</div>
-            <div class="gStats">
-              <span class="statChip">Score: <span id="gScore">0</span></span>
-              <span class="statChip">Best: <span id="gBest">0</span></span>
-              <span class="statChip">Status: <span id="gState">READY</span></span>
+    <footer class="footer">
+      <div>
+        <span>Keys:</span>
+        <span class="kbd">1–9</span> öffnen
+        <span class="kbd">Enter</span> weiter
+        <span class="kbd">Esc</span> beenden
+        <span class="kbd">M</span> sound
+        <span class="kbd">R</span> reset
+      </div>
+      <div id="smallStatus">Alles verteilt • Kein Scroll • Fokus auf Icons</div>
+    </footer>
+  </main>
+
+  <!-- MODAL -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalFX" aria-hidden="true"></div>
+
+      <div class="modalInner">
+        <div class="modalHeader">
+          <div class="modalTitle">
+            <h1 class="h" id="modalTitle">Titel</h1>
+            <div class="meta">
+              <span class="pill"><span class="pDot"></span><span id="modalMeta">1 / 1</span></span>
+              <span class="pill"><span class="pDot"></span><span id="modalType">TEXT</span></span>
+              <span class="pill"><span class="pDot"></span><span id="modalDone">Status: offen</span></span>
             </div>
           </div>
+          <button class="closeX px" id="btnClose" type="button">BEENDEN ✕</button>
+        </div>
 
-          <canvas id="game" width="960" height="420" aria-label="Pilz-Cup Mini-Game"></canvas>
+        <div class="modalBody">
+          <div class="typeArea">
+            <div class="typeTop">
+              <div id="typeHint">Satz wird getippt… (klick oder Enter = sofort fertig)</div>
+              <div id="typeSpeed">⌁</div>
+            </div>
 
-          <div class="gameHelp px">
-            <div><b>Steuerung:</b> ← → oder A/D • Mobile: swipe links/rechts</div>
-            <div><b>Ziel:</b> ausweichen so lange wie möglich. Crash = Game Over.</div>
-            <div><b>Hinweis:</b> Das Mini-Game zählt als „gesehen“, wenn du im Popup <b>OK</b> drückst.</div>
+            <div class="typeBox">
+              <div class="typed px" id="typed"></div>
+
+              <!-- birthday twins image -->
+              <div class="imgRow" id="imgRow" style="display:none;">
+                <div class="squareImg" id="twinBox" style="display:none;">
+                  <img id="twinImg" src="twin.png" alt="twin.png" />
+                </div>
+              </div>
+
+              <!-- game area -->
+              <div class="gameArea" id="gameArea" style="display:none;">
+                <div class="gameStats">
+                  <span class="gChip">Score: <b id="gScore">0</b></span>
+                  <span class="gChip">Best: <b id="gBest">0</b></span>
+                  <span class="gChip">Status: <b id="gState">READY</b></span>
+                </div>
+                <canvas id="jumpGame" width="980" height="420" aria-label="Pilz-Cup Jump Game"></canvas>
+                <div class="gameHint px">
+                  <b>Steuerung:</b> Space / ↑ / Klick = springen • <b>Ziel:</b> so lange wie möglich über Hindernisse • Crash = Game Over.<br>
+                  (Runner ist „67“, so wie du wolltest.)
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- hidden file input for per-item image -->
-        <input class="hidden" type="file" accept="image/*" id="imgInput" />
+        <div class="modalFooter">
+          <div class="footerLeft">
+            <span class="pill"><span class="pDot"></span> Weiter zeigt den nächsten Satz (falls vorhanden)</span>
+          </div>
+          <div class="footerRight">
+            <button class="btn btnGhost px" id="btnEnd" type="button">BEENDEN</button>
+            <button class="btn btnPrimary px" id="btnNext" type="button">WEITER</button>
+          </div>
+        </div>
       </div>
 
-      <div class="dialogBottom">
-        <button class="btn btnCancel px" id="btnCancel" type="button">ABBRECHEN</button>
-        <button class="btn btnOK px" id="btnOK" type="button">OK</button>
-      </div>
-
+      <!-- thinking overlay -->
       <div class="thinking" id="thinking">
-        <div class="thinkBox px">
-          <p class="thinkTitle">Thinking…</p>
-          <div style="font-size:12px; opacity:0.85;">lade den Moment…</div>
+        <div class="thinkCard px">
+          <p class="t1">Thinking…</p>
+          <p class="t2">lade den Moment…</p>
           <div class="dots" aria-hidden="true">
-            <div class="dotPulse"></div>
-            <div class="dotPulse"></div>
-            <div class="dotPulse"></div>
+            <div class="dp"></div><div class="dp"></div><div class="dp"></div>
           </div>
         </div>
       </div>
@@ -1207,33 +1220,28 @@ Wenn du was öffnest:
 
   <!-- VICTORY -->
   <div class="victory" id="victory" aria-hidden="true">
-    <div class="victoryCard" role="dialog" aria-modal="true" aria-labelledby="vicTitle">
-      <canvas class="confetti" id="confetti" width="1200" height="700"></canvas>
+    <div class="vicCard" role="dialog" aria-modal="true" aria-labelledby="vicTitle">
+      <canvas id="confetti" width="1200" height="700"></canvas>
+      <div class="vicFX" aria-hidden="true"></div>
 
-      <div class="victoryTop">
-        <h2 class="px" id="vicTitle">CUP GEWONNEN</h2>
-      </div>
-
-      <div class="victoryBody">
-        <div class="laurel" aria-hidden="true">
-          <!-- simple laurel SVG -->
-          <svg width="260" height="120" viewBox="0 0 260 120" fill="none">
-            <path d="M52 98 C20 80, 14 50, 34 22" stroke="#2aa84a" stroke-width="10" stroke-linecap="round"/>
-            <path d="M208 98 C240 80, 246 50, 226 22" stroke="#2aa84a" stroke-width="10" stroke-linecap="round"/>
-            <circle cx="130" cy="55" r="22" fill="#ffd54a" stroke="#0b1b3f" stroke-width="6"/>
-            <path d="M120 54 L128 62 L143 45" stroke="#0b1b3f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+      <div class="vicInner">
+        <div class="vicTop">
+          <h2 class="px" id="vicTitle">CUP GEWONNEN</h2>
+          <button class="closeX px" id="btnCloseVictory" type="button">BEENDEN ✕</button>
         </div>
 
-        <p class="victoryText px" id="victoryText">
-Bilcan glückwunsch du hast Den Cup gewonnen
-        </p>
-      </div>
+        <div class="vicBody">
+          <div class="vicPaper px">
+            <p class="vicMsg" id="vicMsg">Bilcan glückwunsch du hast Den Cup gewonnen</p>
+            <div class="vicImg" id="cupBox">
+              <img id="cupImg" src="cup.png" alt="cup.png" />
+            </div>
+          </div>
+        </div>
 
-      <div class="victoryBottom">
-        <div class="resetWarn px">Du kannst resetten, wenn du willst (R).</div>
-        <div style="display:flex; gap:10px;">
-          <button class="btn px" id="btnCloseVictory" type="button">OK</button>
+        <div class="vicBottom">
+          <div>Wenn du willst: <span class="kbd">R</span> reset</div>
+          <div>Sound: <span id="vicSound">AN</span></div>
         </div>
       </div>
     </div>
@@ -1241,201 +1249,602 @@ Bilcan glückwunsch du hast Den Cup gewonnen
 
   <script>
     /* ============================================================
-      DATA (deine Insider + Text so wie du es geschrieben hast)
-      - Änderungen an Formulierungen: minimal (nur Zeilenumbrüche sauber)
-      - OK hakt ab
-      - Pilz-Cup: Mini-Game
+      DATA — deine Texte, möglichst unverändert
+      Rule: "mehr als ein satz" => WEITER steps.
+      Praktisch: wir splitten in Segmente pro Zeile (nicht aggressive Punkt-Splitting),
+      damit dein Schreibstil bleibt.
     ============================================================ */
 
     const ITEMS = [
       {
-        id: "nonchalant",
-        title: "nonchalant",
-        subtitle: "als ich dich gekonnt ignoriert habe…",
-        type: "text",
-        text:
-`als ich dich gekonnt ignoriert habe und kaum wahrgenommen habe hast du mich für nonchalant gehalten`
+        id:"nonchalant",
+        title:"nonchalant",
+        subtitle:"als ich dich gekonnt ignoriert habe…",
+        icon:"spark",
+        type:"text",
+        segments: [
+          "als ich dich gekonnt ignoriert habe und kaum wahrgenommen habe hast du mich für nonchalant gehalten"
+        ]
       },
       {
-        id: "sideeye",
-        title: "sideeye",
-        subtitle: "da dachtest du ich bin ne zicke…",
-        type: "text",
-        text:
-`da dachtest du ich bin ne zicke (ich konnte 67 nicht ab )
-von wo soll ich wissen das du noch relevant sein wirst`
+        id:"sideeye",
+        title:"sideeye",
+        subtitle:"da dachtest du ich bin ne zicke…",
+        icon:"eye",
+        type:"text",
+        segments: [
+          "da dachtest du ich bin ne zicke (ich konnte 67 nicht ab )",
+          "von wo soll ich wissen das du noch relevant sein wirst"
+        ]
       },
       {
-        id: "birthday_twins",
-        title: "birthday twins",
-        subtitle: "erste mal das mein geburtag wieder relevant war…",
-        type: "text",
-        text:
-`erste mal das mein geburtag wieder relevant war 
-(du hypersenible)
-schätze lowkey das du mein caretaken apprecieates 
-ich hinterfrage nicht aber checke wie du dich fühlst (glaub ich zu mindestens manschmal)`
+        id:"birthday_twins",
+        title:"birthday twins",
+        subtitle:"erste mal das mein geburtag wieder relevant war…",
+        icon:"cake",
+        type:"text",
+        showTwinImage:true, // twin.png
+        segments: [
+          "erste mal das mein geburtag wieder relevant war",
+          "(du hypersenible)",
+          "schätze lowkey das du mein caretaken apprecieates",
+          "ich hinterfrage nicht aber checke wie du dich fühlst (glaub ich zu mindestens manschmal)"
+        ]
       },
       {
-        id: "toad_yoshi",
-        title: "toad & yoshi",
-        subtitle: "mario party duo runde…",
-        type: "text",
-        text:
-`wann kann man behaupten das man mit ner frau mario party gezockt hat auch wenn du das 1vs 1 gewonnen hast war unser duo runde mir sehr viel spaß gemacht`
+        id:"toad_yoshi",
+        title:"toad & yoshi",
+        subtitle:"mario party duo runde…",
+        icon:"mush",
+        type:"text",
+        segments: [
+          "wann kann man behaupten das man mit ner frau mario party gezockt hat auch wenn du das 1vs 1 gewonnen hast war unser duo runde mir sehr viel spaß gemacht"
+        ]
       },
       {
-        id: "six_seven",
-        title: "67",
-        subtitle: "six seveeeen…",
-        type: "text",
-        text:
-`six seveeeen (gott weiß wie weit es dazu kam das ich das jetzt sage)`
+        id:"67",
+        title:"67",
+        subtitle:"six seveeeen…",
+        icon:"num",
+        type:"text",
+        segments: [
+          "six seveeeen (gott weiß wie weit es dazu kam das ich das jetzt sage)"
+        ]
       },
       {
-        id: "suessli_muesli",
-        title: "süßli müsli",
-        subtitle: "Lowkey…",
-        type: "text",
-        text:
-`Lowkey wir haben echt coole erinerungen zusammen`
+        id:"suessli",
+        title:"süßli müsli",
+        subtitle:"Lowkey…",
+        icon:"heart",
+        type:"text",
+        segments: [
+          "Lowkey wir haben echt coole erinerungen zusammen"
+        ]
       },
       {
-        id: "sami_salma",
-        title: "Sami und salma",
-        subtitle: "dankbar für die lachkik…",
-        type: "text",
-        text:
-`Bin den beiden echt dankbar das wir so lachkik mit den beiden haben konnten salma supa und sami strammer bira (düsseldorf)
-mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spaß haben`
+        id:"sami_salma",
+        title:"Sami und salma",
+        subtitle:"düsseldorf — salma supa & sami strammer bira…",
+        icon:"people",
+        type:"text",
+        segments: [
+          "Bin den beiden echt dankbar das wir so lachkik mit den beiden haben konnten salma supa und sami strammer bira (düsseldorf)",
+          "mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spaß haben"
+        ]
       },
       {
-        id: "tishtennis",
-        title: "tishtennis",
-        subtitle: "hast meinen schläger beansprucht…",
-        type: "text",
-        text:
-`hast meienen schläger beansprucht`
+        id:"tishtennis",
+        title:"tishtennis",
+        subtitle:"schläger beansprucht…",
+        icon:"ping",
+        type:"text",
+        segments: [
+          "hast meienen schläger beansprucht"
+        ]
       },
       {
-        id: "pilz_cup",
-        title: "Pilz-Cup",
-        subtitle: "Mini-Game statt Text",
-        type: "game",
-        text:
-`hier kommt stat eines text ein kleines minigame so ein endlos runner wo man ähnlich wie subway surfer links rechts ausweichen muss in einem kart wie mariokart`
+        id:"pilz_cup",
+        title:"Pilz-Cup",
+        subtitle:"Jump Game statt Text",
+        icon:"run",
+        type:"game",
+        segments: [
+          "hier kommt stat eines text ein kleines minigame"
+        ]
       }
     ];
 
     /* ============================================================
-      PERSISTENCE
+      STORAGE
     ============================================================ */
-    const STORAGE_KEY = "mkds_gift_progress_v1";
-    const IMAGE_KEY = "mkds_gift_images_v1";
-    const SETTINGS_KEY = "mkds_gift_settings_v1";
+    const KEY_PROGRESS = "mkds_gift_progress_v2";
+    const KEY_SETTINGS = "mkds_gift_settings_v2";
+    const KEY_GAMEBEST = "mkds_gift_jump_best_v1";
 
     const state = {
-      focusedIndex: 0,
-      openItemId: null,
-      progress: {},     // {id:true}
-      images: {},       // {id: dataURL}
-      settings: {
-        sound: true,
-        scanlines: true
-      }
+      openId: null,
+      segIndex: 0,
+      typedBusy: false,
+      typedSkip: false,
+      progress: {},
+      settings: { sound:true }
     };
 
-    function loadState(){
+    function load(){
       try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw) state.progress = JSON.parse(raw) || {};
+        const p = localStorage.getItem(KEY_PROGRESS);
+        if(p) state.progress = JSON.parse(p) || {};
       }catch(e){}
-
       try{
-        const raw = localStorage.getItem(IMAGE_KEY);
-        if(raw) state.images = JSON.parse(raw) || {};
-      }catch(e){}
-
-      try{
-        const raw = localStorage.getItem(SETTINGS_KEY);
-        if(raw){
-          const s = JSON.parse(raw);
-          if(s && typeof s === "object"){
-            state.settings.sound = !!s.sound;
-            state.settings.scanlines = !!s.scanlines;
-          }
+        const s = localStorage.getItem(KEY_SETTINGS);
+        if(s){
+          const o = JSON.parse(s);
+          if(o && typeof o === "object") state.settings.sound = !!o.sound;
         }
       }catch(e){}
     }
-
-    function saveProgress(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
-    }
-    function saveImages(){
-      localStorage.setItem(IMAGE_KEY, JSON.stringify(state.images));
-    }
-    function saveSettings(){
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
-    }
-
-    function resetAll(){
-      state.progress = {};
-      state.images = {};
-      saveProgress();
-      saveImages();
-      updateUI();
-      closeDialog(true);
-      hideVictory();
-      playBack();
-    }
+    function saveProgress(){ localStorage.setItem(KEY_PROGRESS, JSON.stringify(state.progress)); }
+    function saveSettings(){ localStorage.setItem(KEY_SETTINGS, JSON.stringify(state.settings)); }
 
     /* ============================================================
       DOM
     ============================================================ */
-    const menuEl = document.getElementById("menu");
+    const starsEl = document.getElementById("stars");
+    const gridEl = document.getElementById("grid");
+    const progText = document.getElementById("progText");
+    const progFill = document.getElementById("progFill");
+    const btnSound = document.getElementById("btnSound");
+    const soundLabel = document.getElementById("soundLabel");
+    const btnReset = document.getElementById("btnReset");
 
     const overlay = document.getElementById("overlay");
-    const dlgTitle = document.getElementById("dlgTitle");
-    const dlgText = document.getElementById("dlgText");
-    const dlgImageRow = document.getElementById("dlgImageRow");
-    const btnOK = document.getElementById("btnOK");
-    const btnCancel = document.getElementById("btnCancel");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalMeta = document.getElementById("modalMeta");
+    const modalType = document.getElementById("modalType");
+    const modalDone = document.getElementById("modalDone");
+    const btnClose = document.getElementById("btnClose");
+    const btnEnd = document.getElementById("btnEnd");
+    const btnNext = document.getElementById("btnNext");
+    const typedEl = document.getElementById("typed");
+    const typeHint = document.getElementById("typeHint");
     const thinking = document.getElementById("thinking");
 
-    const previewTitle = document.getElementById("previewTitle");
-    const previewText = document.getElementById("previewText");
+    const imgRow = document.getElementById("imgRow");
+    const twinBox = document.getElementById("twinBox");
+    const twinImg = document.getElementById("twinImg");
 
-    const chipProgress = document.getElementById("chipProgress");
-    const progressText = document.getElementById("progressText");
-    const progressFill = document.getElementById("progressFill");
-
-    const chipSound = document.getElementById("chipSound");
-    const soundText = document.getElementById("soundText");
-
-    const chipScan = document.getElementById("chipScan");
-    const scanText = document.getElementById("scanText");
-
-    const btnReset = document.getElementById("btnReset");
-    const btnToggleSound = document.getElementById("btnToggleSound");
-    const btnToggleScan = document.getElementById("btnToggleScan");
-
-    const bottomScreen = document.getElementById("bottomScreen");
-
-    const victory = document.getElementById("victory");
-    const btnCloseVictory = document.getElementById("btnCloseVictory");
-    const victoryText = document.getElementById("victoryText");
-
-    const imgInput = document.getElementById("imgInput");
-
-    // game
-    const gameWrap = document.getElementById("gameWrap");
-    const gameCanvas = document.getElementById("game");
+    const gameArea = document.getElementById("gameArea");
+    const jumpCanvas = document.getElementById("jumpGame");
     const gScoreEl = document.getElementById("gScore");
     const gBestEl = document.getElementById("gBest");
     const gStateEl = document.getElementById("gState");
 
+    const victory = document.getElementById("victory");
+    const btnCloseVictory = document.getElementById("btnCloseVictory");
+    const vicMsg = document.getElementById("vicMsg");
+    const vicSound = document.getElementById("vicSound");
+    const cupImg = document.getElementById("cupImg");
+    const cupBox = document.getElementById("cupBox");
+
+    const confettiCanvas = document.getElementById("confetti");
+    const cctx = confettiCanvas.getContext("2d");
+
     /* ============================================================
-      AUDIO (WebAudio Synth, no external files)
+      Stars generator
+    ============================================================ */
+    function makeStars(){
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      starsEl.innerHTML = "";
+      const count = Math.min(120, Math.floor((W*H)/13000));
+      for(let i=0;i<count;i++){
+        const s = document.createElement("div");
+        s.className = "star";
+        const x = Math.random()*100;
+        const y = Math.random()*100;
+        const d = 1.7 + Math.random()*2.6;
+        const a = 0.5 + Math.random()*0.9;
+        s.style.left = x + "%";
+        s.style.top = y + "%";
+        s.style.animationDuration = (2.0 + Math.random()*2.8) + "s";
+        s.style.opacity = String(a);
+        s.style.transform = `scale(${d/3})`;
+        starsEl.appendChild(s);
+      }
+    }
+
+    /* ============================================================
+      Icon SVGs (simple, pixel-ish)
+    ============================================================ */
+    function iconSVG(kind){
+      // Each returns an SVG string (white-ish strokes)
+      const base = `stroke="rgba(255,255,255,.92)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+      switch(kind){
+        case "eye":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><path ${base} d="M12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>`;
+        case "cake":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M7 10h10v10H7z"/><path ${base} d="M7 14c1 1 2 1 3 0s2-1 3 0 2 1 3 0 2-1 3 0"/><path ${base} d="M9 7c0-1.5 3-1.5 3 0 0 1-1 2-1.5 3-.5-1-1.5-2-1.5-3z"/></svg>`;
+        case "mush":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M5 12c0-4 3-7 7-7s7 3 7 7H5z"/><path ${base} d="M9 12v6c0 1 1 2 3 2s3-1 3-2v-6"/><path ${base} d="M8 9h.01M12 8h.01M16 9h.01"/></svg>`;
+        case "num":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M8 7h8M7 12h10M8 17h8"/><path ${base} d="M10 5l-2 14M16 5l-2 14"/></svg>`;
+        case "heart":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>`;
+        case "people":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M16 11a3 3 0 1 0-6 0"/><path ${base} d="M5 20c1-4 13-4 14 0"/><path ${base} d="M7.5 9.5a2 2 0 1 0 0 .01"/><path ${base} d="M18 9.5a2 2 0 1 0 0 .01"/></svg>`;
+        case "ping":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M7 20l3-9c.6-2 2.4-3 4-3h3l-1 6h-4l-2 6z"/><path ${base} d="M15 8l2-4"/></svg>`;
+        case "run":
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M13 5h.01"/><path ${base} d="M12 7l2 2 3 1"/><path ${base} d="M11 9l-2 4 2 2-1 4"/><path ${base} d="M13 13l4 2 2 4"/><path ${base} d="M4 20h16"/></svg>`;
+        default:
+          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z"/></svg>`;
+      }
+    }
+
+    /* ============================================================
+      Build grid tiles
+    ============================================================ */
+    function buildGrid(){
+      gridEl.innerHTML = "";
+      ITEMS.forEach((it, idx)=>{
+        const tile = document.createElement("button");
+        tile.type = "button";
+        tile.className = "tile px";
+        tile.setAttribute("data-id", it.id);
+        tile.setAttribute("aria-label", it.title);
+
+        const done = !!state.progress[it.id];
+        if(done) tile.classList.add("done");
+
+        const num = idx+1;
+        tile.innerHTML = `
+          <div class="tileTop">
+            <div class="iconBadge" aria-hidden="true">${iconSVG(it.icon)}</div>
+            <div class="stamp"><span class="miniDot"></span><span>${done ? "gesehen" : "offen"}</span></div>
+          </div>
+
+          <div class="tileTitle">
+            <div class="t">${escapeHTML(it.title)}</div>
+            <div class="s">${escapeHTML(it.subtitle || "")}</div>
+          </div>
+
+          <div class="tileHint">
+            <div>Öffnen</div>
+            <div><span class="kbd">${num}</span></div>
+          </div>
+        `;
+
+        tile.addEventListener("click", ()=>{
+          open(it.id);
+        });
+
+        gridEl.appendChild(tile);
+      });
+    }
+
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    /* ============================================================
+      Progress + Victory
+    ============================================================ */
+    function countDone(){
+      return ITEMS.reduce((a,it)=>a + (state.progress[it.id] ? 1 : 0), 0);
+    }
+
+    function updateProgressUI(){
+      const done = countDone();
+      const total = ITEMS.length;
+      progText.textContent = `Fortschritt: ${done} / ${total}`;
+      const pct = total ? Math.round(done/total*100) : 0;
+      progFill.style.width = pct + "%";
+
+      soundLabel.textContent = state.settings.sound ? "AN" : "AUS";
+      vicSound.textContent = state.settings.sound ? "AN" : "AUS";
+    }
+
+    function maybeVictory(){
+      if(countDone() === ITEMS.length){
+        showVictory();
+      }
+    }
+
+    /* ============================================================
+      Modal open/close
+    ============================================================ */
+    function showOverlay(){
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden","false");
+    }
+    function hideOverlay(){
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden","true");
+    }
+
+    async function showThinking(ms=520){
+      thinking.classList.add("show");
+      await sleep(ms);
+      thinking.classList.remove("show");
+    }
+    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+    function open(id){
+      const it = ITEMS.find(x=>x.id===id);
+      if(!it) return;
+
+      state.openId = id;
+      state.segIndex = 0;
+
+      // header
+      modalTitle.textContent = it.title;
+      modalType.textContent = it.type === "game" ? "GAME" : "TEXT";
+      modalDone.textContent = state.progress[id] ? "Status: gesehen" : "Status: offen";
+
+      // segment meta
+      modalMeta.textContent = `${state.segIndex+1} / ${it.segments.length}`;
+
+      // buttons
+      btnNext.style.display = (it.type === "text" && it.segments.length > 1) ? "inline-flex" : (it.type==="text" ? "none" : "none");
+
+      // show/hide image
+      imgRow.style.display = "none";
+      twinBox.style.display = "none";
+
+      if(it.showTwinImage){
+        imgRow.style.display = "flex";
+        twinBox.style.display = "block";
+
+        // if missing file, hide the box automatically
+        twinImg.onerror = () => { twinBox.style.display = "none"; };
+      }
+
+      // show/hide game
+      if(it.type === "game"){
+        gameArea.style.display = "grid";
+        btnNext.style.display = "none";
+        typeHint.textContent = "Jump Game — Space / ↑ / Klick springt";
+      }else{
+        gameArea.style.display = "none";
+        typeHint.textContent = "Satz wird getippt… (klick oder Enter = sofort fertig)";
+        stopGame();
+      }
+
+      typedEl.textContent = "";
+      showOverlay();
+
+      // thinking vibe
+      playOpen();
+      showThinking(560).then(()=>{
+        if(it.type === "game"){
+          startGame();
+        }else{
+          typeSegment();
+        }
+      });
+    }
+
+    function close(){
+      stopGame();
+      hideOverlay();
+      state.openId = null;
+      state.segIndex = 0;
+      state.typedBusy = false;
+      state.typedSkip = false;
+      playClose();
+    }
+
+    btnClose.addEventListener("click", close);
+    btnEnd.addEventListener("click", ()=>{
+      // if user closes while still typing, we still allow
+      // mark as done only if they have reached last segment (text) OR opened game (game)
+      finalizeIfEligible();
+      close();
+      maybeVictory();
+    });
+
+    /* ============================================================
+      Typewriter (zeichen für zeichen)
+      - click / Enter => instantly reveal full line
+      - Weiter => next segment
+    ============================================================ */
+    function currentItem(){
+      return ITEMS.find(x=>x.id===state.openId);
+    }
+
+    function finalizeIfEligible(){
+      const it = currentItem();
+      if(!it) return;
+
+      if(it.type === "game"){
+        // mark done when they end the game popup
+        state.progress[it.id] = true;
+      }else{
+        // mark done only if they reached last segment (segIndex at last)
+        if(state.segIndex >= it.segments.length - 1){
+          state.progress[it.id] = true;
+        }
+      }
+      saveProgress();
+      updateProgressUI();
+      buildGrid();
+      modalDone.textContent = state.progress[it.id] ? "Status: gesehen" : "Status: offen";
+    }
+
+    async function typeSegment(){
+      const it = currentItem();
+      if(!it || it.type !== "text") return;
+
+      const seg = it.segments[state.segIndex] ?? "";
+      modalMeta.textContent = `${state.segIndex+1} / ${it.segments.length}`;
+
+      // show/hide Weiter
+      const hasMore = state.segIndex < it.segments.length - 1;
+      btnNext.style.display = hasMore ? "inline-flex" : "none";
+
+      typedEl.textContent = "";
+      state.typedBusy = true;
+      state.typedSkip = false;
+
+      // per-character speed (slightly varied)
+      const baseDelay = 16; // fast, but still visible
+      const extra = 22;
+
+      for(let i=0;i<seg.length;i++){
+        if(state.typedSkip){
+          typedEl.textContent = seg;
+          break;
+        }
+        typedEl.textContent += seg[i];
+
+        // tiny key sound
+        playTypeTick(i);
+
+        const ch = seg[i];
+        const d = baseDelay + (ch===" " ? 6 : 0) + (Math.random()*extra);
+        await sleep(d);
+      }
+
+      state.typedBusy = false;
+
+      // if last segment finished typing, mark as eligible (not fully done until Beenden, but we set status hint)
+      if(!hasMore){
+        modalDone.textContent = "Status: bereit zum beenden";
+      }else{
+        modalDone.textContent = "Status: weiter verfügbar";
+      }
+    }
+
+    btnNext.addEventListener("click", async ()=>{
+      const it = currentItem();
+      if(!it || it.type!=="text") return;
+
+      // if still typing: skip to full reveal
+      if(state.typedBusy){
+        state.typedSkip = true;
+        playSkip();
+        return;
+      }
+
+      // next segment
+      if(state.segIndex < it.segments.length - 1){
+        state.segIndex++;
+        playNext();
+        await typeSegment();
+      }
+
+      // if we just reached last, we can mark completion only when user ends (your rule: end after everything seen)
+      modalMeta.textContent = `${state.segIndex+1} / ${it.segments.length}`;
+    });
+
+    // click inside type box to skip typing
+    document.querySelector(".typeBox").addEventListener("click", ()=>{
+      const it = currentItem();
+      if(!it || it.type!=="text") return;
+      if(state.typedBusy){
+        state.typedSkip = true;
+        playSkip();
+      }
+    });
+
+    /* ============================================================
+      Keyboard:
+      - 1..9 opens tiles
+      - Enter => if typing: skip; else if next exists: next; else nothing
+      - Esc => end/close
+      - M toggle sound
+      - R reset
+      - Game: Space/Up jump
+    ============================================================ */
+    window.addEventListener("keydown", (e)=>{
+      const k = e.key.toLowerCase();
+
+      // global toggles
+      if(k === "m"){
+        toggleSound();
+        return;
+      }
+      if(k === "r"){
+        doReset();
+        return;
+      }
+
+      const isOpen = overlay.classList.contains("show");
+      const isVictory = victory.classList.contains("show");
+
+      if(isVictory){
+        if(k === "escape" || k === "enter" || k === " "){
+          hideVictory();
+          playClose();
+        }
+        return;
+      }
+
+      if(!isOpen){
+        // open by number
+        if(/^[1-9]$/.test(k)){
+          const idx = parseInt(k,10) - 1;
+          const it = ITEMS[idx];
+          if(it) open(it.id);
+        }
+        return;
+      }
+
+      // modal open
+      if(k === "escape"){
+        e.preventDefault();
+        finalizeIfEligible();
+        close();
+        maybeVictory();
+        return;
+      }
+
+      const it = currentItem();
+      if(!it) return;
+
+      if(it.type === "text"){
+        if(k === "enter"){
+          e.preventDefault();
+          if(state.typedBusy){
+            state.typedSkip = true;
+            playSkip();
+          }else{
+            // if next exists, go next; else do nothing (user can end)
+            if(state.segIndex < it.segments.length - 1){
+              btnNext.click();
+            }
+          }
+        }
+      }
+
+      // game keys handled in game section (space/up)
+    });
+
+    /* ============================================================
+      Reset
+    ============================================================ */
+    function doReset(){
+      if(confirm("Reset wirklich? (Fortschritt + Bestscore werden gelöscht)")){
+        state.progress = {};
+        localStorage.removeItem(KEY_PROGRESS);
+        localStorage.removeItem(KEY_GAMEBEST);
+        updateProgressUI();
+        buildGrid();
+        hideVictory();
+        playClose();
+      }else{
+        playClose();
+      }
+    }
+    btnReset.addEventListener("click", doReset);
+
+    /* ============================================================
+      Sound (WebAudio synth)
     ============================================================ */
     let audioCtx = null;
     function ensureAudio(){
@@ -1451,520 +1860,65 @@ mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spa�
       return audioCtx;
     }
 
-    function beep({type="square", freq=440, dur=0.06, vol=0.06, slideTo=null}={}){
+    function tone({type="square", f=440, d=0.06, v=0.06, slide=null}={}){
       const ctx = ensureAudio();
       if(!ctx) return;
       const t0 = ctx.currentTime;
       const o = ctx.createOscillator();
       const g = ctx.createGain();
-
       o.type = type;
-      o.frequency.setValueAtTime(freq, t0);
-      if(slideTo){
-        o.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
-      }
-
+      o.frequency.setValueAtTime(f, t0);
+      if(slide) o.frequency.exponentialRampToValueAtTime(slide, t0 + d);
       g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-
-      o.connect(g);
-      g.connect(ctx.destination);
-
-      o.start(t0);
-      o.stop(t0 + dur + 0.02);
+      g.gain.exponentialRampToValueAtTime(v, t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t0); o.stop(t0 + d + 0.02);
     }
 
-    function playNavigate(){
-      beep({type:"square", freq: 520, dur: 0.05, vol: 0.05, slideTo: 440});
+    function playOpen(){
+      tone({type:"triangle", f:520, d:0.08, v:0.06, slide:760});
+      setTimeout(()=>tone({type:"square", f:760, d:0.06, v:0.05, slide:980}), 60);
     }
-    function playConfirm(){
-      beep({type:"triangle", freq: 760, dur: 0.07, vol: 0.07, slideTo: 980});
-      setTimeout(()=>beep({type:"square", freq: 980, dur: 0.05, vol: 0.05}), 40);
+    function playClose(){
+      tone({type:"square", f:260, d:0.08, v:0.05, slide:180});
     }
-    function playBack(){
-      beep({type:"square", freq: 260, dur: 0.08, vol: 0.06, slideTo: 180});
+    function playNext(){
+      tone({type:"triangle", f:700, d:0.06, v:0.06, slide:920});
     }
-    function playToggle(){
-      beep({type:"sine", freq: 620, dur: 0.06, vol: 0.05, slideTo: 520});
+    function playSkip(){
+      tone({type:"sine", f:820, d:0.04, v:0.04, slide:740});
+    }
+    function playTypeTick(i){
+      // very subtle tick (not every char)
+      if(!state.settings.sound) return;
+      if(i % 2 !== 0) return;
+      tone({type:"square", f: (420 + (i%14)*10), d:0.02, v:0.01});
     }
     function playWin(){
-      // simple "fanfare"
-      beep({type:"triangle", freq: 523, dur: 0.10, vol: 0.06});
-      setTimeout(()=>beep({type:"triangle", freq: 659, dur: 0.10, vol: 0.06}), 90);
-      setTimeout(()=>beep({type:"triangle", freq: 784, dur: 0.12, vol: 0.07}), 180);
-      setTimeout(()=>beep({type:"square", freq: 1046, dur: 0.14, vol: 0.07}), 280);
+      tone({type:"triangle", f:523, d:0.10, v:0.06});
+      setTimeout(()=>tone({type:"triangle", f:659, d:0.10, v:0.06}), 90);
+      setTimeout(()=>tone({type:"triangle", f:784, d:0.12, v:0.07}), 180);
+      setTimeout(()=>tone({type:"square", f:1046, d:0.14, v:0.07}), 280);
     }
 
-    /* ============================================================
-      RENDER MENU
-    ============================================================ */
-    function iconSVG(){
-      return `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 12.5l4 4 12-12" fill="none" stroke="#0b1b3f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      `;
-    }
-
-    function buildMenu(){
-      menuEl.innerHTML = "";
-      ITEMS.forEach((item, i)=>{
-        const li = document.createElement("li");
-        li.className = "menuItem px";
-        li.tabIndex = 0;
-        li.setAttribute("role","option");
-        li.setAttribute("data-id", item.id);
-        li.setAttribute("data-index", String(i));
-
-        li.innerHTML = `
-          <div class="left">
-            <div class="iconBox" aria-hidden="true">
-              <div class="icon"></div>
-            </div>
-            <div class="label">
-              <div class="main">${escapeHTML(item.title)}</div>
-              <div class="sub">${escapeHTML(item.subtitle || "")}</div>
-            </div>
-          </div>
-          <div class="right">
-            <div class="badge">${item.type === "game" ? "MINIGAME" : "TEXT"}</div>
-            <div class="check" aria-hidden="true">
-              ${iconSVG()}
-            </div>
-          </div>
-        `;
-
-        li.addEventListener("mouseenter", ()=>{
-          setFocus(i, false);
-        });
-
-        li.addEventListener("click", ()=>{
-          openItemByIndex(i);
-        });
-
-        li.addEventListener("keydown", (e)=>{
-          // Enter triggers open from focused item too
-          if(e.key === "Enter" || e.key === " "){
-            e.preventDefault();
-            openItemByIndex(i);
-          }
-        });
-
-        menuEl.appendChild(li);
-      });
-    }
-
-    function escapeHTML(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    /* ============================================================
-      FOCUS + NAV
-    ============================================================ */
-    function setFocus(index, withSound=true){
-      state.focusedIndex = clamp(index, 0, ITEMS.length-1);
-      const items = [...menuEl.querySelectorAll(".menuItem")];
-      items.forEach(el => el.classList.remove("isFocus"));
-      const focusEl = items[state.focusedIndex];
-      if(focusEl){
-        focusEl.classList.add("isFocus");
-        focusEl.scrollIntoView({block:"nearest", inline:"nearest"});
-      }
-
-      // preview
-      const item = ITEMS[state.focusedIndex];
-      previewTitle.textContent = item.title;
-      previewText.textContent = item.type === "game" ? item.text : item.text;
-
-      if(withSound) playNavigate();
-    }
-
-    function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
-
-    /* ============================================================
-      DIALOG OPEN / CLOSE
-    ============================================================ */
-    function showOverlay(){
-      overlay.classList.add("show");
-      overlay.setAttribute("aria-hidden","false");
-      document.body.style.overflow = "hidden";
-    }
-    function hideOverlay(){
-      overlay.classList.remove("show");
-      overlay.setAttribute("aria-hidden","true");
-      document.body.style.overflow = "";
-    }
-
-    function showThinking(ms=520){
-      thinking.classList.add("show");
-      return new Promise(resolve=>{
-        setTimeout(()=>{
-          thinking.classList.remove("show");
-          resolve();
-        }, ms);
-      });
-    }
-
-    function openItemByIndex(index){
-      setFocus(index, true);
-      const item = ITEMS[index];
-      state.openItemId = item.id;
-
-      // Fill dialog
-      dlgTitle.textContent = item.title;
-      dlgText.textContent = item.type === "game" ? item.text : item.text;
-
-      // Render image slot for this item (optional)
-      renderImageArea(item.id);
-
-      // Toggle game section
-      if(item.type === "game"){
-        gameWrap.classList.remove("hidden");
-        startGameUI();
-      }else{
-        gameWrap.classList.add("hidden");
-        stopGame();
-      }
-
-      showOverlay();
-      // think effect
-      showThinking(560).then(()=>{
-        // after thinking
-      });
-
-      playConfirm();
-      updateDialogButtons();
-    }
-
-    function updateDialogButtons(){
-      const id = state.openItemId;
-      if(!id) return;
-      const done = !!state.progress[id];
-      btnOK.textContent = done ? "OK (abgehakt)" : "OK";
-    }
-
-    function closeDialog(silent=false){
-      stopGame();
-      state.openItemId = null;
-      if(!silent) playBack();
-      hideOverlay();
-    }
-
-    /* clicking outside dialog closes? mkds style: no.
-       but you can still click overlay to "Abbrechen" if you want:
-       we keep it strict: only buttons / keys */
-    overlay.addEventListener("click", (e)=>{
-      // ignore outside-click to keep DS vibe
-      // if you want: uncomment next 2 lines
-      // if(e.target === overlay) closeDialog();
-    });
-
-    btnCancel.addEventListener("click", ()=>{
-      closeDialog();
-    });
-
-    btnOK.addEventListener("click", ()=>{
-      if(!state.openItemId) return;
-      state.progress[state.openItemId] = true;
-      saveProgress();
-      playConfirm();
-      updateUI();
-      updateDialogButtons();
-
-      // close after short delay like game confirm
-      setTimeout(()=>{
-        closeDialog(true);
-        checkVictory();
-      }, 120);
-    });
-
-    /* ============================================================
-      IMAGE PER ITEM (optional)
-      - inside dialog: add / remove
-      - stored in localStorage as dataURL
-    ============================================================ */
-    function renderImageArea(itemId){
-      dlgImageRow.innerHTML = "";
-      const hasImg = !!state.images[itemId];
-
-      const box = document.createElement("div");
-      box.className = "imgBox px";
-
-      const tools = document.createElement("div");
-      tools.className = "imgTools";
-
-      const left = document.createElement("div");
-      left.style.display="flex";
-      left.style.gap="10px";
-      left.style.alignItems="center";
-
-      const addBtn = document.createElement("button");
-      addBtn.type="button";
-      addBtn.className = "btnMini px";
-      addBtn.textContent = hasImg ? "Bild ersetzen" : "Bild hinzufügen";
-
-      const remBtn = document.createElement("button");
-      remBtn.type="button";
-      remBtn.className = "btnMini px";
-      remBtn.textContent = "Bild entfernen";
-      remBtn.style.opacity = hasImg ? "1" : "0.5";
-      remBtn.disabled = !hasImg;
-
-      const hint = document.createElement("div");
-      hint.className = "px";
-      hint.style.fontSize="11px";
-      hint.style.opacity="0.8";
-      hint.textContent = "optional – du kannst hier später Bilder reinpacken";
-
-      left.appendChild(addBtn);
-      left.appendChild(remBtn);
-
-      tools.appendChild(left);
-      tools.appendChild(hint);
-
-      box.appendChild(tools);
-
-      if(hasImg){
-        const img = document.createElement("img");
-        img.alt = "Bild (optional) für " + itemId;
-        img.src = state.images[itemId];
-        box.insertBefore(img, tools);
-      }
-
-      dlgImageRow.appendChild(box);
-
-      addBtn.addEventListener("click", ()=>{
-        imgInput.value = "";
-        imgInput.onchange = () => {
-          const file = imgInput.files && imgInput.files[0];
-          if(!file) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            state.images[itemId] = String(reader.result || "");
-            saveImages();
-            renderImageArea(itemId);
-            playToggle();
-          };
-          reader.readAsDataURL(file);
-        };
-        imgInput.click();
-      });
-
-      remBtn.addEventListener("click", ()=>{
-        delete state.images[itemId];
-        saveImages();
-        renderImageArea(itemId);
-        playBack();
-      });
-    }
-
-    /* ============================================================
-      UI UPDATE (checks, progress, toggles)
-    ============================================================ */
-    function countDone(){
-      let done = 0;
-      for(const it of ITEMS){
-        if(state.progress[it.id]) done++;
-      }
-      return done;
-    }
-
-    function updateUI(){
-      // menu checkmarks
-      const rows = [...menuEl.querySelectorAll(".menuItem")];
-      rows.forEach(row=>{
-        const id = row.getAttribute("data-id");
-        const done = !!state.progress[id];
-        row.classList.toggle("checked", done);
-      });
-
-      // progress
-      const done = countDone();
-      const total = ITEMS.length;
-      progressText.textContent = `Fortschritt: ${done} / ${total}`;
-      const pct = total ? Math.round((done/total)*100) : 0;
-      progressFill.style.width = pct + "%";
-
-      // sound/scan chips
-      soundText.textContent = `Sound: ${state.settings.sound ? "AN" : "AUS"}`;
-      scanText.textContent  = `Scanlines: ${state.settings.scanlines ? "AN" : "AUS"}`;
-
-      // toggle scanlines class on screens
-      const scanTargets = document.querySelectorAll(".screenInner");
-      scanTargets.forEach(el=>{
-        el.classList.toggle("scanlines", state.settings.scanlines);
-      });
-    }
-
-    /* ============================================================
-      VICTORY CHECK
-    ============================================================ */
-    function isAllDone(){
-      return countDone() === ITEMS.length;
-    }
-
-    function checkVictory(){
-      if(isAllDone()){
-        showVictory();
-      }
-    }
-
-    function showVictory(){
-      victory.classList.add("show");
-      victory.setAttribute("aria-hidden","false");
-      playWin();
-      startConfetti();
-    }
-
-    function hideVictory(){
-      victory.classList.remove("show");
-      victory.setAttribute("aria-hidden","true");
-      stopConfetti();
-    }
-
-    btnCloseVictory.addEventListener("click", ()=>{
-      hideVictory();
-      playConfirm();
-    });
-
-    /* ============================================================
-      SETTINGS TOGGLES
-    ============================================================ */
     function toggleSound(){
       state.settings.sound = !state.settings.sound;
       saveSettings();
-      updateUI();
-      playToggle();
+      updateProgressUI();
+      if(state.settings.sound) ensureAudio();
+      tone({type:"sine", f: (state.settings.sound? 740 : 240), d:0.06, v:0.05, slide: (state.settings.sound? 920 : 180)});
     }
-    function toggleScan(){
-      state.settings.scanlines = !state.settings.scanlines;
-      saveSettings();
-      updateUI();
-      playToggle();
-    }
+    btnSound.addEventListener("click", toggleSound);
 
-    btnToggleSound.addEventListener("click", toggleSound);
-    chipSound.addEventListener("click", toggleSound);
-
-    btnToggleScan.addEventListener("click", toggleScan);
-    chipScan.addEventListener("click", toggleScan);
-
-    btnReset.addEventListener("click", ()=>{
-      if(confirm("Reset wirklich? (Fortschritt + Bilder werden gelöscht)")){
-        resetAll();
-      }else{
-        playBack();
-      }
-    });
+    // unlock audio on first pointer
+    window.addEventListener("pointerdown", ()=>{
+      if(state.settings.sound) ensureAudio();
+    }, {once:true});
 
     /* ============================================================
-      KEYBOARD / DS CONTROLS
-      - Up/Down focus
-      - Enter/Space/A confirm/open/OK
-      - Escape/B back/cancel
-      - M sound, L scan, R reset
+      Victory overlay + confetti
     ============================================================ */
-    window.addEventListener("keydown", (e)=>{
-      const key = e.key.toLowerCase();
-
-      const dialogOpen = overlay.classList.contains("show");
-      const victoryOpen = victory.classList.contains("show");
-
-      // victory
-      if(victoryOpen){
-        if(key === "enter" || key === " " || key === "a"){
-          e.preventDefault();
-          hideVictory();
-          playConfirm();
-        }
-        if(key === "escape" || key === "b"){
-          e.preventDefault();
-          hideVictory();
-          playBack();
-        }
-        if(key === "r"){
-          e.preventDefault();
-          if(confirm("Reset wirklich? (Fortschritt + Bilder werden gelöscht)")){
-            resetAll();
-          }
-        }
-        return;
-      }
-
-      // global toggles
-      if(!dialogOpen){
-        if(key === "m"){ toggleSound(); return; }
-        if(key === "l"){ toggleScan(); return; }
-        if(key === "r"){
-          e.preventDefault();
-          if(confirm("Reset wirklich? (Fortschritt + Bilder werden gelöscht)")){
-            resetAll();
-          }else{
-            playBack();
-          }
-          return;
-        }
-      }
-
-      if(dialogOpen){
-        // dialog controls
-        if(key === "escape" || key === "b"){
-          e.preventDefault();
-          closeDialog();
-          return;
-        }
-        if(key === "enter" || key === " " || key === "a"){
-          e.preventDefault();
-          btnOK.click();
-          return;
-        }
-        // if game open: allow arrows for game too
-        if(state.openItemId === "pilz_cup"){
-          if(key === "arrowleft" || key === "a" || key === "d" || key === "arrowright"){
-            // game handles separately
-          }
-        }
-        return;
-      }
-
-      // menu navigation
-      if(e.key === "ArrowDown"){
-        e.preventDefault();
-        setFocus(state.focusedIndex+1, true);
-      }
-      if(e.key === "ArrowUp"){
-        e.preventDefault();
-        setFocus(state.focusedIndex-1, true);
-      }
-      if(key === "enter" || key === " " || key === "a"){
-        e.preventDefault();
-        openItemByIndex(state.focusedIndex);
-      }
-    });
-
-    /* ============================================================
-      INIT
-    ============================================================ */
-    function init(){
-      loadState();
-      buildMenu();
-      updateUI();
-      setFocus(0, false);
-      checkVictory();
-    }
-    init();
-
-    /* ============================================================
-      CONFETTI (simple canvas)
-    ============================================================ */
-    const confettiCanvas = document.getElementById("confetti");
-    const cctx = confettiCanvas.getContext("2d");
     let confettiRAF = null;
     let confettiParts = [];
 
@@ -1980,26 +1934,23 @@ mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spa�
       resizeConfetti();
       confettiParts = [];
       const rect = confettiCanvas.getBoundingClientRect();
-      const W = rect.width;
-      const H = rect.height;
-
-      for(let i=0;i<140;i++){
+      const W = rect.width, H = rect.height;
+      for(let i=0;i<160;i++){
         confettiParts.push({
           x: Math.random()*W,
           y: -20 - Math.random()*H,
-          vx: -0.5 + Math.random()*1.0,
-          vy: 1.2 + Math.random()*2.6,
-          r: 2 + Math.random()*4,
-          a: 0.6 + Math.random()*0.4,
-          t: Math.random()*Math.PI*2
+          vx: -0.6 + Math.random()*1.2,
+          vy: 1.4 + Math.random()*3.2,
+          w: 3 + Math.random()*6,
+          h: 2 + Math.random()*4,
+          t: Math.random()*Math.PI*2,
+          a: 0.65 + Math.random()*0.35
         });
       }
 
       const tick = ()=>{
-        const rect2 = confettiCanvas.getBoundingClientRect();
-        const W2 = rect2.width;
-        const H2 = rect2.height;
-
+        const r = confettiCanvas.getBoundingClientRect();
+        const W2 = r.width, H2 = r.height;
         cctx.clearRect(0,0,W2,H2);
 
         confettiParts.forEach(p=>{
@@ -2011,15 +1962,12 @@ mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spa�
             p.x = Math.random()*W2;
           }
 
-          const wobble = Math.sin(p.t)*1.8;
+          const wob = Math.sin(p.t)*2;
           cctx.globalAlpha = p.a;
 
-          // no fixed colors requested => we still keep MKDS-ish palette but not too strict
-          // We'll derive from p.t to vary subtly
-          const hue = (p.t*60) % 360;
-          cctx.fillStyle = `hsla(${hue}, 85%, 65%, 0.9)`;
-
-          cctx.fillRect(p.x + wobble, p.y, p.r*2.2, p.r);
+          const hue = (p.t * 60) % 360;
+          cctx.fillStyle = `hsla(${hue}, 90%, 65%, 0.95)`;
+          cctx.fillRect(p.x + wob, p.y, p.w, p.h);
         });
 
         cctx.globalAlpha = 1;
@@ -2033,100 +1981,98 @@ mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spa�
     function stopConfetti(){
       if(confettiRAF) cancelAnimationFrame(confettiRAF);
       confettiRAF = null;
-      const rect = confettiCanvas.getBoundingClientRect();
-      cctx.clearRect(0,0,rect.width, rect.height);
+      const r = confettiCanvas.getBoundingClientRect();
+      cctx.clearRect(0,0,r.width,r.height);
     }
 
-    window.addEventListener("resize", ()=>{
-      if(victory.classList.contains("show")){
-        resizeConfetti();
+    function showVictory(){
+      victory.classList.add("show");
+      victory.setAttribute("aria-hidden","false");
+      playWin();
+      startConfetti();
+
+      // show cup.png if it exists
+      cupBox.style.display = "none";
+      cupImg.onerror = ()=>{ cupBox.style.display = "none"; };
+      cupImg.onload = ()=>{ cupBox.style.display = "block"; };
+      // if cached & instantly available:
+      if(cupImg.complete && cupImg.naturalWidth > 0){
+        cupBox.style.display = "block";
       }
+    }
+
+    function hideVictory(){
+      victory.classList.remove("show");
+      victory.setAttribute("aria-hidden","true");
+      stopConfetti();
+    }
+
+    btnCloseVictory.addEventListener("click", ()=>{
+      hideVictory();
+      playClose();
+    });
+
+    window.addEventListener("resize", ()=>{
+      makeStars();
+      if(victory.classList.contains("show")) resizeConfetti();
     });
 
     /* ============================================================
-      MINI-GAME: Pilz-Cup Endless Runner (3 lanes)
-      - simple pixel art drawing
-      - obstacles spawn and move
-      - lane switching with left/right
-      - score increases with time
-      - collision = game over
-      - best stored in localStorage
+      Pilz-Cup Jump Game (simple dino-like)
+      Runner: "67"
     ============================================================ */
-    const GAME_BEST_KEY = "mkds_gift_game_best_v1";
-
     const game = {
-      running: false,
-      over: false,
-      started: false,
-      lane: 1, // 0 left,1 mid,2 right
-      score: 0,
-      best: 0,
-      speed: 6,
-      spawnTimer: 0,
+      ctx: jumpCanvas.getContext("2d"),
+      running:false,
+      over:false,
+      t:0,
+      score:0,
+      best:0,
+
+      // player
+      x:120,
+      y:0,
+      vy:0,
+      onGround:true,
+
+      // world
+      groundY: 320,
+      speed: 6.2,
+      spawn: 0,
       obstacles: [],
-      lastT: 0,
-      raf: null,
-      touchX: null
+      raf:null
     };
 
     function loadBest(){
       try{
-        const raw = localStorage.getItem(GAME_BEST_KEY);
+        const raw = localStorage.getItem(KEY_GAMEBEST);
         game.best = raw ? (parseInt(raw,10) || 0) : 0;
-      }catch(e){}
-      gBestEl.textContent = game.best;
+      }catch(e){ game.best = 0; }
+      gBestEl.textContent = String(game.best);
     }
-    loadBest();
 
     function saveBest(){
-      localStorage.setItem(GAME_BEST_KEY, String(game.best));
-    }
-
-    function startGameUI(){
-      loadBest();
-      gScoreEl.textContent = "0";
-      gStateEl.textContent = "READY";
-      // auto-start after a tiny delay for vibe
-      setTimeout(()=>{
-        if(state.openItemId === "pilz_cup"){
-          startGame();
-        }
-      }, 220);
+      localStorage.setItem(KEY_GAMEBEST, String(game.best));
     }
 
     function startGame(){
-      if(state.openItemId !== "pilz_cup") return;
-
-      const ctx = gameCanvas.getContext("2d");
+      loadBest();
       game.running = true;
       game.over = false;
-      game.started = true;
-      game.lane = 1;
+      game.t = performance.now();
       game.score = 0;
-      game.speed = 6;
-      game.spawnTimer = 0;
+      game.speed = 6.2;
+      game.spawn = 0.8;
       game.obstacles = [];
-      game.lastT = performance.now();
+      game.y = game.groundY;
+      game.vy = 0;
+      game.onGround = true;
+
+      gScoreEl.textContent = "0";
       gStateEl.textContent = "RUN";
 
-      // spawn a tiny intro obstacle delay
-      for(let i=0;i<2;i++){
-        game.obstacles.push(makeObstacle(1200 + i*300));
-      }
-
       if(game.raf) cancelAnimationFrame(game.raf);
-      const loop = (t)=>{
-        const dt = Math.min(0.033, (t - game.lastT)/1000);
-        game.lastT = t;
-
-        updateGame(dt);
-        renderGame(ctx);
-
-        if(game.running){
-          game.raf = requestAnimationFrame(loop);
-        }
-      };
-      game.raf = requestAnimationFrame(loop);
+      game.raf = requestAnimationFrame(loopGame);
     }
 
     function stopGame(){
@@ -2136,341 +2082,273 @@ mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spa�
       gStateEl.textContent = "STOP";
     }
 
-    function laneX(lane, W){
-      // 3 lanes equally spaced
-      const pad = W * 0.18;
-      const span = W - pad*2;
-      return pad + (span/2) * lane;
-    }
+    function loopGame(now){
+      const dt = Math.min(0.033, (now - game.t)/1000);
+      game.t = now;
 
-    function makeObstacle(x){
-      return {
-        x,
-        lane: Math.floor(Math.random()*3),
-        w: 40 + Math.random()*20,
-        h: 30 + Math.random()*18,
-        kind: Math.random() < 0.5 ? "pipe" : "crate",
-      };
+      updateGame(dt);
+      renderGame();
+
+      if(game.running){
+        game.raf = requestAnimationFrame(loopGame);
+      }
     }
 
     function updateGame(dt){
       if(!game.running) return;
 
-      // speed slowly increases
-      game.speed += dt * 0.45;
+      // speed up a bit
+      game.speed += dt * 0.35;
 
       // score
       game.score += dt * 60;
-      const s = Math.floor(game.score);
-      gScoreEl.textContent = String(s);
+      gScoreEl.textContent = String(Math.floor(game.score));
 
-      // spawn
-      game.spawnTimer -= dt;
-      if(game.spawnTimer <= 0){
-        game.spawnTimer = 0.55 + Math.random()*0.45;
-        game.obstacles.push(makeObstacle(1100 + Math.random()*200));
+      // gravity
+      const g = 1900;
+      game.vy += g * dt;
+      game.y += game.vy * dt;
+
+      if(game.y >= game.groundY){
+        game.y = game.groundY;
+        game.vy = 0;
+        game.onGround = true;
+      }
+
+      // spawn obstacles
+      game.spawn -= dt;
+      if(game.spawn <= 0){
+        game.spawn = 0.85 + Math.random()*0.55;
+        const h = 34 + Math.random()*28;
+        const w = 18 + Math.random()*18;
+        game.obstacles.push({
+          x: 980 + 60,
+          y: game.groundY,
+          w, h
+        });
       }
 
       // move obstacles
-      const speed = game.speed * 60 * dt; // convert-ish for canvas units
+      const vx = game.speed * 70 * dt;
       for(const o of game.obstacles){
-        o.x -= speed;
+        o.x -= vx;
       }
-      // remove offscreen
-      game.obstacles = game.obstacles.filter(o => o.x > -200);
+      game.obstacles = game.obstacles.filter(o => o.x > -80);
 
-      // collision check
-      // player position
-      const W = gameCanvas.width;
-      const playerX = laneX(game.lane, W);
-      const playerY = gameCanvas.height * 0.78;
-      const pW = 64;
-      const pH = 40;
-
+      // collision
+      const px = game.x, py = game.y;
+      const pW = 46, pH = 52; // approximate for "67"
       for(const o of game.obstacles){
-        const oX = o.x;
-        const oY = gameCanvas.height * 0.78;
-        const oW = o.w;
-        const oH = o.h;
+        const ox = o.x, oy = o.y;
+        const ow = o.w, oh = o.h;
+        const hit =
+          (px < ox + ow) &&
+          (px + pW > ox) &&
+          (py - pH < oy) &&
+          (py > oy - oh);
 
-        const laneDx = Math.abs(laneX(o.lane, W) - playerX);
-        const sameLane = laneDx < 10;
-
-        if(sameLane){
-          const hit =
-            (oX < playerX + pW*0.5) &&
-            (oX + oW > playerX - pW*0.5) &&
-            (oY < playerY + pH*0.5) &&
-            (oY + oH > playerY - pH*0.5);
-
-          if(hit){
-            crash();
-            break;
-          }
+        if(hit){
+          gameOver();
+          break;
         }
       }
     }
 
-    function crash(){
+    function gameOver(){
       game.running = false;
       game.over = true;
       gStateEl.textContent = "GAME OVER";
-      playBack();
+      playClose();
 
-      const finalScore = Math.floor(game.score);
-      if(finalScore > game.best){
-        game.best = finalScore;
+      const s = Math.floor(game.score);
+      if(s > game.best){
+        game.best = s;
         gBestEl.textContent = String(game.best);
         saveBest();
-        playConfirm();
+        playNext();
       }
-
-      // auto restart hint
-      setTimeout(()=>{
-        if(state.openItemId === "pilz_cup"){
-          gStateEl.textContent = "TAP / ENTER: RESTART";
-        }
-      }, 250);
     }
 
-    function renderGame(ctx){
-      const W = gameCanvas.width;
-      const H = gameCanvas.height;
+    function jump(){
+      const it = currentItem();
+      if(!it || it.type !== "game") return;
 
-      // pixel render: draw at lower res then scale? (simpler: just draw chunky shapes)
+      if(game.over){
+        playOpen();
+        startGame();
+        return;
+      }
+      if(game.onGround){
+        game.onGround = false;
+        game.vy = -740; // jump strength
+        // jump sound
+        tone({type:"triangle", f:520, d:0.06, v:0.05, slide:760});
+      }
+    }
+
+    // input for game
+    jumpCanvas.addEventListener("pointerdown", jump);
+    window.addEventListener("keydown", (e)=>{
+      const it = currentItem();
+      if(!it || it.type !== "game") return;
+      if(!overlay.classList.contains("show")) return;
+
+      const k = e.key.toLowerCase();
+      if(k === " " || k === "arrowup"){
+        e.preventDefault();
+        jump();
+      }
+    }, {passive:false});
+
+    function renderGame(){
+      const ctx = game.ctx;
+      const W = jumpCanvas.width;
+      const H = jumpCanvas.height;
+
       ctx.clearRect(0,0,W,H);
 
-      // sky
-      ctx.fillStyle = "#bfe6ff";
+      // sky gradient
+      const grd = ctx.createLinearGradient(0,0,0,H);
+      grd.addColorStop(0, "#e9f6ff");
+      grd.addColorStop(1, "#cfeaff");
+      ctx.fillStyle = grd;
       ctx.fillRect(0,0,W,H);
 
-      // far track lines / stands vibe
+      // distant pixel clouds
       ctx.globalAlpha = 0.18;
-      ctx.fillStyle = "#0b1b3f";
-      for(let i=0;i<12;i++){
-        ctx.fillRect(0, 30 + i*16, W, 2);
+      ctx.fillStyle = "#0c1433";
+      for(let i=0;i<10;i++){
+        const x = (i*120 + (performance.now()*0.02)%120) % W;
+        ctx.fillRect(x, 70 + (i%3)*18, 54, 10);
+        ctx.fillRect(x+14, 60 + (i%3)*18, 30, 12);
       }
       ctx.globalAlpha = 1;
 
-      // road
-      const roadTop = H*0.45;
+      // ground
       ctx.fillStyle = "#6f7a88";
-      ctx.fillRect(0, roadTop, W, H-roadTop);
+      ctx.fillRect(0, game.groundY, W, H - game.groundY);
 
-      // perspective lanes
-      ctx.strokeStyle = "rgba(255,255,255,0.45)";
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(W*0.33, H);
-      ctx.lineTo(W*0.46, roadTop);
-      ctx.moveTo(W*0.66, H);
-      ctx.lineTo(W*0.54, roadTop);
-      ctx.stroke();
-
-      // side borders
-      ctx.strokeStyle = "rgba(255,215,0,0.55)";
-      ctx.lineWidth = 10;
-      ctx.beginPath();
-      ctx.moveTo(0, H);
-      ctx.lineTo(W*0.18, roadTop);
-      ctx.moveTo(W, H);
-      ctx.lineTo(W*0.82, roadTop);
-      ctx.stroke();
+      // ground line
+      ctx.fillStyle = "rgba(0,0,0,0.25)";
+      ctx.fillRect(0, game.groundY, W, 4);
 
       // obstacles
       for(const o of game.obstacles){
-        const x = laneX(o.lane, W) + (o.x - 600); // base
-        const y = H*0.78;
-        drawObstacle(ctx, x, y, o);
+        ctx.fillStyle = "#ff4d9a";
+        ctx.strokeStyle = "rgba(0,0,0,0.35)";
+        ctx.lineWidth = 6;
+        ctx.fillRect(o.x, o.y - o.h, o.w, o.h);
+        ctx.strokeRect(o.x, o.y - o.h, o.w, o.h);
+
+        // pixel highlight
+        ctx.fillStyle = "rgba(255,255,255,0.22)";
+        ctx.fillRect(o.x + 4, o.y - o.h + 6, Math.max(4, o.w*0.25), 10);
       }
 
-      // kart (player)
-      drawKart(ctx);
+      // runner "67"
+      drawRunner67(ctx, game.x, game.y);
 
-      // scanlines-ish on canvas (subtle)
-      ctx.globalAlpha = 0.14;
+      // scanlines on canvas (subtle)
+      ctx.globalAlpha = 0.12;
       ctx.fillStyle = "#000";
-      for(let y=0;y<H;y+=4){
+      for(let y=0;y<H;y+=6){
         ctx.fillRect(0,y,W,1);
       }
       ctx.globalAlpha = 1;
 
-      // if game over overlay
+      // overlay text
       if(game.over){
-        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fillRect(0,0,W,H);
+
         ctx.fillStyle = "rgba(255,255,255,0.92)";
-        ctx.strokeStyle = "rgba(0,0,0,0.30)";
+        ctx.strokeStyle = "rgba(0,0,0,0.25)";
         ctx.lineWidth = 8;
-        ctx.fillRect(W*0.18, H*0.20, W*0.64, H*0.22);
-        ctx.strokeRect(W*0.18, H*0.20, W*0.64, H*0.22);
+        ctx.fillRect(W*0.18, H*0.22, W*0.64, H*0.22);
+        ctx.strokeRect(W*0.18, H*0.22, W*0.64, H*0.22);
 
-        ctx.fillStyle = "#0b1b3f";
-        ctx.font = "bold 44px ui-monospace, monospace";
+        ctx.fillStyle = "#0c1433";
+        ctx.font = "900 44px " + getComputedStyle(document.body).fontFamily;
         ctx.textAlign = "center";
-        ctx.fillText("GAME OVER", W*0.50, H*0.32);
+        ctx.fillText("GAME OVER", W*0.50, H*0.34);
 
-        ctx.font = "bold 20px ui-monospace, monospace";
-        ctx.fillText("TAP / ENTER: RESTART", W*0.50, H*0.38);
+        ctx.font = "900 18px " + getComputedStyle(document.body).fontFamily;
+        ctx.fillText("SPACE / ↑ / KLICK = RESTART", W*0.50, H*0.40);
       }
     }
 
-    function drawObstacle(ctx, x, y, o){
-      // chunky pixel shapes
-      ctx.save();
-      ctx.translate(x, y);
-
-      if(o.kind === "pipe"){
-        ctx.fillStyle = "#2aa84a";
-        ctx.strokeStyle = "rgba(0,0,0,0.35)";
-        ctx.lineWidth = 6;
-        ctx.fillRect(-o.w/2, -o.h, o.w, o.h);
-        ctx.strokeRect(-o.w/2, -o.h, o.w, o.h);
-
-        ctx.fillStyle = "rgba(255,255,255,0.18)";
-        ctx.fillRect(-o.w/2 + 6, -o.h + 6, o.w*0.25, o.h-12);
-      }else{
-        ctx.fillStyle = "#b07a3a";
-        ctx.strokeStyle = "rgba(0,0,0,0.35)";
-        ctx.lineWidth = 6;
-        ctx.fillRect(-o.w/2, -o.h, o.w, o.h);
-        ctx.strokeRect(-o.w/2, -o.h, o.w, o.h);
-
-        ctx.fillStyle = "rgba(0,0,0,0.10)";
-        ctx.fillRect(-o.w/2, -o.h + o.h*0.55, o.w, 6);
-
-        ctx.fillStyle = "rgba(255,255,255,0.18)";
-        ctx.fillRect(-o.w/2 + 8, -o.h + 8, o.w*0.35, 10);
-      }
-
-      ctx.restore();
-    }
-
-    function drawKart(ctx){
-      const W = gameCanvas.width;
-      const H = gameCanvas.height;
-
-      const x = laneX(game.lane, W);
-      const y = H*0.78;
-
-      // kart body
+    function drawRunner67(ctx, x, y){
+      // chunky pixel-ish text “67”
       ctx.save();
       ctx.translate(x, y);
 
       // shadow
       ctx.fillStyle = "rgba(0,0,0,0.25)";
-      ctx.beginPath();
-      ctx.ellipse(0, 14, 46, 14, 0, 0, Math.PI*2);
-      ctx.fill();
+      ctx.fillRect(-4, 6, 54, 10);
 
-      // chassis
-      ctx.fillStyle = "#e53935";
+      // body plate
+      ctx.fillStyle = "#44f0ff";
       ctx.strokeStyle = "rgba(0,0,0,0.35)";
       ctx.lineWidth = 7;
-      ctx.fillRect(-38, -22, 76, 34);
-      ctx.strokeRect(-38, -22, 76, 34);
+      ctx.fillRect(0, -56, 48, 48);
+      ctx.strokeRect(0, -56, 48, 48);
 
       // highlight
-      ctx.fillStyle = "rgba(255,255,255,0.18)";
-      ctx.fillRect(-32, -18, 18, 26);
+      ctx.fillStyle = "rgba(255,255,255,0.22)";
+      ctx.fillRect(6, -50, 12, 30);
 
-      // wheels
-      ctx.fillStyle = "#1c1f28";
-      ctx.strokeStyle = "rgba(255,255,255,0.10)";
-      ctx.lineWidth = 4;
-      ctx.fillRect(-46, -16, 14, 20);
-      ctx.fillRect(32, -16, 14, 20);
-      ctx.strokeRect(-46, -16, 14, 20);
-      ctx.strokeRect(32, -16, 14, 20);
+      // text 67
+      ctx.fillStyle = "#0c1433";
+      ctx.font = "900 28px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = "center";
+      ctx.fillText("67", 24, -22);
 
-      // driver blob (no face)
-      ctx.fillStyle = "#0b1b3f";
-      ctx.fillRect(-10, -40, 20, 18);
-      ctx.fillStyle = "#f4fbff";
-      ctx.globalAlpha = 0.6;
-      ctx.fillRect(-8, -38, 8, 10);
-      ctx.globalAlpha = 1;
+      // tiny legs
+      ctx.fillStyle = "#0c1433";
+      ctx.fillRect(8, -8, 10, 10);
+      ctx.fillRect(30, -8, 10, 10);
 
       ctx.restore();
     }
 
-    // game input
-    function moveLane(dir){
-      if(state.openItemId !== "pilz_cup") return;
-      if(game.over){
-        // restart
-        playConfirm();
-        startGame();
-        return;
-      }
-      game.lane = clamp(game.lane + dir, 0, 2);
-      playNavigate();
+    /* ============================================================
+      Modal end behavior (mark done rules)
+    ============================================================ */
+    function onEndPressed(){
+      finalizeIfEligible();
+      close();
+      maybeVictory();
+    }
+    btnEnd.addEventListener("click", onEndPressed);
+    // closeX already triggers close; keep end button as main
+
+    /* ============================================================
+      Cup.png handling already in victory show; twin.png in modal.
+      Make sure twin box hides if missing file.
+    ============================================================ */
+    twinImg.onerror = ()=>{ twinBox.style.display = "none"; };
+
+    /* ============================================================
+      INIT
+    ============================================================ */
+    load();
+    makeStars();
+    buildGrid();
+    updateProgressUI();
+
+    // If cached victory condition
+    if(countDone() === ITEMS.length){
+      showVictory();
     }
 
-    window.addEventListener("keydown", (e)=>{
-      if(state.openItemId !== "pilz_cup") return;
-      if(!overlay.classList.contains("show")) return;
-
-      if(e.key === "ArrowLeft" || e.key.toLowerCase() === "a"){
-        e.preventDefault();
-        moveLane(-1);
-      }
-      if(e.key === "ArrowRight" || e.key.toLowerCase() === "d"){
-        e.preventDefault();
-        moveLane(+1);
-      }
-      if(e.key === "Enter" && game.over){
-        e.preventDefault();
-        moveLane(0);
-      }
-    }, {passive:false});
-
-    // touch swipe on canvas
-    gameCanvas.addEventListener("pointerdown", (e)=>{
-      gameCanvas.setPointerCapture(e.pointerId);
-      game.touchX = e.clientX;
-      if(game.over){
-        moveLane(0);
-      }
+    // Close overlay if click on dark background? user didn’t ask, so we keep strict:
+    // Only beenden closes.
+    overlay.addEventListener("click", (e)=>{
+      // keep strict; no outside close
     });
 
-    gameCanvas.addEventListener("pointermove", (e)=>{
-      if(game.touchX == null) return;
-      const dx = e.clientX - game.touchX;
-      if(Math.abs(dx) > 34){
-        moveLane(dx > 0 ? +1 : -1);
-        game.touchX = e.clientX;
-      }
-    });
-
-    gameCanvas.addEventListener("pointerup", ()=>{
-      game.touchX = null;
-    });
-
-    /* ============================================================
-      FINAL: victory auto-check after any close
-    ============================================================ */
-    function afterAnyClose(){
-      checkVictory();
-    }
-
-    // also allow closing dialog via overlay buttons already wired
-
-    /* ============================================================
-      FIRST USER INTERACTION: unlock audio on touch
-    ============================================================ */
-    window.addEventListener("pointerdown", ()=>{
-      // create audio context on first tap
-      if(state.settings.sound) ensureAudio();
-    }, {once:true});
-
-    /* ============================================================
-      Start focus after render
-    ============================================================ */
-    setTimeout(()=>{
-      setFocus(0, false);
-    }, 50);
-
+    // "Enter" behavior for text: skip typing or next
+    // (already in keydown)
   </script>
 </body>
 </html>
