@@ -3,567 +3,587 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>MKDS Nostalgie Gift — Bilcan</title>
+  <meta name="color-scheme" content="dark" />
+  <title>TWIN KART DS — Gift One-Sider</title>
 
   <style>
     /* ============================================================
-      MKDS Nostalgie Gift — NEW LAYOUT (No Preview, No Scroll Menu)
-      - Fullscreen Hub (icons + titles)
-      - Click icon => Popup/“Seite”
-      - Buttons: WEITER / BEENDEN (no OK/Abbrechen)
-      - Multi-sentence content => WEITER steps through sentences
-      - Each sentence: typewriter (zeichen für zeichen)
-      - Pilz-Cup => simple jump game (Chrome dino-style) with "67"
-      - birthday twins => square image twin.png (place file next to this html)
-      - optional victory image => cup.png (place file next to this html)
-      - No external assets; audio via WebAudio
+      TWIN KART DS — FINAL Single-HTML
+      Uses repo files (same folder):
+        - rainbowRoad.mp3
+        - nonchalant.jpg
+        - sideeye.jpg
+        - twins.jpg
+        - twin.png
+        - toadyoshi.jpg
+        - 67.jpg
+        - süslimüsli.jpg
+        - ss.jpg
+        - tischtennis.jpg
+        - tortuga.jpg
+        Optional:
+        - Mario Kart DS - Rainbow Road.mp4
+      Controls:
+        - START / Enter -> begin, cups appear, music starts
+        - M -> toggle music
+        - R -> reset progress
+        - 1..9 -> open cups quickly (hub)
+        - Popup: click/Enter while typing -> instant reveal
+        - WEITER shows next sentence
+        - BEENDEN/Esc closes
+        - Tortuga game: Space/↑/Click = jump, restart after crash
     ============================================================ */
 
     :root{
-      --ink:#0b0b0b;
-      --paper:#f7fbff;
-      --shade:rgba(0,0,0,.18);
+      --bg0:#050712; --bg1:#070b1a; --bg2:#0b1030; --bg3:#0d1538;
+      --glass: rgba(255,255,255,.07);
+      --glass2: rgba(255,255,255,.10);
+      --line: rgba(255,255,255,.14);
 
-      /* new palette (different from last attempt) */
-      --bg0:#0a0f1d;
-      --bg1:#0e1430;
-      --bg2:#141b3f;
+      --paper: rgba(255,255,255,.94);
+      --ink: rgba(0,0,0,.90);
 
-      --neon1:#44f0ff;
-      --neon2:#7cff66;
-      --neon3:#ffce4d;
-      --neon4:#ff4d9a;
-      --neon5:#8a6bff;
+      --c:#3df3ff;  --g:#7dff6a; --y:#ffd25a; --p:#ff4fa5; --v:#8e6cff;
 
-      --panel:#f1f6ff;
-      --panel2:#e4efff;
+      --shadow: rgba(0,0,0,.58);
+      --shadow2: rgba(0,0,0,.42);
 
-      --border:#0c1433;
-      --border2:#1a2a66;
+      --r1: 16px; --r2: 22px; --r3: 30px;
 
-      --btn:#ffffff;
-      --btn2:#e9f6ff;
-
-      --shadow: rgba(0,0,0,.45);
-      --glow: rgba(68,240,255,.22);
-
-      /* pixel font vibe */
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --radius: 22px;
+
+      --scan: .14;
+      --grain: .10;
+
+      --easeOut: cubic-bezier(.18,.88,.22,1);
+      --easeIn: cubic-bezier(.42,0,.58,1);
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
-      overflow:hidden; /* no scroll (user request) */
+      overflow:hidden;
       font-family: var(--mono);
-      color: var(--ink);
-      background: radial-gradient(1200px 800px at 20% 20%, rgba(68,240,255,.10), transparent 55%),
-                  radial-gradient(900px 700px at 80% 40%, rgba(255,77,154,.08), transparent 55%),
-                  radial-gradient(1200px 900px at 40% 90%, rgba(122,255,102,.08), transparent 55%),
-                  linear-gradient(180deg, var(--bg0), var(--bg2));
+      background:
+        radial-gradient(1400px 900px at 12% 14%, rgba(61,243,255,.09), transparent 62%),
+        radial-gradient(1200px 900px at 82% 32%, rgba(255,79,165,.08), transparent 60%),
+        radial-gradient(1200px 900px at 48% 92%, rgba(125,255,106,.08), transparent 62%),
+        linear-gradient(180deg, var(--bg0), var(--bg2));
+      color: rgba(255,255,255,.92);
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Pixel-ish text */
+    button{ font-family: var(--mono); }
+    img{ display:block; max-width:100%; }
+    ::selection{ background: rgba(61,243,255,.22); }
+
     .px{
-      letter-spacing: .4px;
       text-rendering: geometricPrecision;
+      letter-spacing: .45px;
       text-shadow:
-        1px 0 0 rgba(255,255,255,0.08),
-        -1px 0 0 rgba(0,0,0,0.08),
-        0 1px 0 rgba(255,255,255,0.06),
-        0 -1px 0 rgba(0,0,0,0.06);
+        1px 0 0 rgba(255,255,255,.06),
+        -1px 0 0 rgba(0,0,0,.12),
+        0 1px 0 rgba(255,255,255,.05),
+        0 -1px 0 rgba(0,0,0,.10);
     }
 
-    /* ============================================================
-      Animated “pixel atmosphere” (new approach)
-    ============================================================ */
-    .bgFX{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      overflow:hidden;
-    }
-
-    /* moving pixel grid */
-    .bgFX::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
+    /* ===================== Background FX ===================== */
+    .bgFX{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+    .bgFX .grid{
+      position:absolute; inset:-35%;
       background:
         linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px) 0 0 / 18px 18px,
         linear-gradient(0deg, rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 18px 18px;
-      transform: rotate(12deg);
-      opacity:.18;
-      animation: driftGrid 22s linear infinite;
+      transform: rotate(11deg);
+      opacity:.16;
+      animation: gridDrift 22s linear infinite;
+      mix-blend-mode: screen;
       filter: blur(.2px);
-      mix-blend-mode: screen;
+    }
+    @keyframes gridDrift{
+      0%{ transform: translate3d(-4%, -2%, 0) rotate(11deg); }
+      100%{ transform: translate3d(4%, 3%, 0) rotate(11deg); }
     }
 
-    @keyframes driftGrid{
-      0%{ transform: translate3d(-4%, -2%, 0) rotate(12deg); }
-      100%{ transform: translate3d(4%, 3%, 0) rotate(12deg); }
+    .bgFX .blob{
+      position:absolute;
+      width: 520px; height: 520px;
+      border-radius: 999px;
+      filter: blur(40px);
+      opacity:.18;
+      animation: blob 10s ease-in-out infinite alternate;
+    }
+    .bgFX .b1{ left:-170px; top:-190px; background: var(--c); animation-duration: 10.2s; }
+    .bgFX .b2{ right:-220px; top: 70px; background: var(--p); animation-duration: 12.6s; }
+    .bgFX .b3{ left: 22%; bottom:-260px; background: var(--g); animation-duration: 11.4s; }
+    @keyframes blob{
+      0%{ transform: translate3d(0,0,0) scale(1); }
+      100%{ transform: translate3d(52px, 38px, 0) scale(1.16); }
     }
 
-    /* pixel “stars” */
-    .stars{
+    .bgFX .stars{ position:absolute; inset:0; mix-blend-mode: screen; opacity:.60; }
+    .bgFX .star{
       position:absolute;
-      inset:0;
-      opacity:.55;
-      filter: blur(.0px);
-      mix-blend-mode: screen;
-    }
-    .star{
-      position:absolute;
-      width: 3px;
-      height: 3px;
-      background: rgba(255,255,255,.9);
-      box-shadow: 0 0 12px rgba(68,240,255,.25);
-      animation: twinkle 2.6s infinite ease-in-out;
+      width:3px; height:3px;
       border-radius: 1px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 0 14px rgba(61,243,255,.25);
+      animation: tw 2.8s ease-in-out infinite;
     }
-    @keyframes twinkle{
+    @keyframes tw{
       0%,100%{ transform: scale(1); opacity:.55; }
-      50%{ transform: scale(1.7); opacity:1; }
+      50%{ transform: scale(1.9); opacity:1; }
     }
 
-    /* scanline overlay (subtle; always on but gentle) */
-    .scan{
-      position:absolute;
-      inset:0;
+    .bgFX .scan{
+      position:absolute; inset:0;
       background: repeating-linear-gradient(
         to bottom,
-        rgba(0,0,0,.10) 0px,
-        rgba(0,0,0,.10) 1px,
+        rgba(0,0,0,.12) 0px,
+        rgba(0,0,0,.12) 1px,
         rgba(255,255,255,0) 3px,
         rgba(255,255,255,0) 6px
       );
-      opacity:.18;
+      opacity: var(--scan);
       mix-blend-mode: multiply;
     }
 
-    /* floating neon blobs */
-    .blob{
-      position:absolute;
-      width: 420px;
-      height: 420px;
-      border-radius: 999px;
-      filter: blur(34px);
-      opacity:.18;
-      animation: blob 9s ease-in-out infinite alternate;
+    .bgFX .grain{
+      position:absolute; inset:0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      opacity: var(--grain);
+      mix-blend-mode: overlay;
+      filter: contrast(140%) brightness(110%);
+      animation: grainMove 10s steps(2,end) infinite;
     }
-    .blob.b1{ left:-120px; top:-140px; background: var(--neon1); animation-duration: 10.5s; }
-    .blob.b2{ right:-160px; top:40px; background: var(--neon4); animation-duration: 12.5s; }
-    .blob.b3{ left:20%; bottom:-190px; background: var(--neon2); animation-duration: 11.2s; }
-    @keyframes blob{
-      0%{ transform: translate3d(0,0,0) scale(1); }
-      100%{ transform: translate3d(40px, 30px, 0) scale(1.12); }
+    @keyframes grainMove{
+      0%{ transform: translate3d(0,0,0); }
+      10%{ transform: translate3d(-2%, -1%, 0); }
+      20%{ transform: translate3d(-4%, 1%, 0); }
+      30%{ transform: translate3d(2%, -2%, 0); }
+      40%{ transform: translate3d(4%, 1%, 0); }
+      50%{ transform: translate3d(-2%, 2%, 0); }
+      60%{ transform: translate3d(-3%, -1%, 0); }
+      70%{ transform: translate3d(3%, -2%, 0); }
+      80%{ transform: translate3d(2%, 2%, 0); }
+      90%{ transform: translate3d(-1%, 1%, 0); }
+      100%{ transform: translate3d(0,0,0); }
     }
 
-    /* ============================================================
-      HUB LAYOUT (Fullscreen)
-    ============================================================ */
-    .hub{
+    /* ===================== App Shell ===================== */
+    .app{
       position:relative;
-      height:100%;
-      padding: 26px 22px;
-      display:grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 16px;
       z-index:1;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding: 18px;
     }
 
-    .topBar{
+    .stage{
+      width: min(1120px, 100%);
+      height: min(780px, 92vh);
+      border-radius: var(--r3);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 48px 140px rgba(0,0,0,.60);
+      overflow:hidden;
+      position:relative;
+    }
+    .stage::before{
+      content:"";
+      position:absolute; inset:-30%;
+      background:
+        radial-gradient(620px 480px at 25% 25%, rgba(61,243,255,.20), transparent 62%),
+        radial-gradient(620px 480px at 78% 68%, rgba(255,210,90,.11), transparent 62%),
+        radial-gradient(620px 480px at 70% 26%, rgba(255,79,165,.14), transparent 62%),
+        radial-gradient(620px 480px at 48% 88%, rgba(125,255,106,.12), transparent 62%);
+      filter: blur(28px);
+      opacity:.92;
+      animation: breathe 6.2s ease-in-out infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes breathe{
+      0%{ transform: scale(1) translateY(0); }
+      100%{ transform: scale(1.05) translateY(-7px); }
+    }
+
+    .screen{ position:relative; z-index:1; height:100%; padding: 18px; display:none; }
+    .screen.show{ display:block; }
+
+    /* ===================== Start Screen ===================== */
+    .start{
+      height:100%;
+      border-radius: var(--r3);
+      position:relative;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+    }
+    .startVideo{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      filter: saturate(120%) contrast(108%) brightness(88%);
+      opacity:.55;
+      transform: scale(1.06);
+      animation: startVideoFloat 8s ease-in-out infinite alternate;
+      display:none;
+    }
+    .startVideo.show{ display:block; }
+    @keyframes startVideoFloat{
+      0%{ transform: scale(1.06) translateY(0); }
+      100%{ transform: scale(1.10) translateY(-10px); }
+    }
+    .startOverlay{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(800px 600px at 18% 20%, rgba(61,243,255,.22), transparent 62%),
+        radial-gradient(800px 600px at 85% 35%, rgba(255,79,165,.18), transparent 62%),
+        radial-gradient(900px 700px at 55% 92%, rgba(125,255,106,.14), transparent 64%),
+        linear-gradient(180deg, rgba(0,0,0,.54), rgba(0,0,0,.28));
+    }
+
+    .startCard{
+      width: min(860px, 94%);
+      border-radius: var(--r3);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 48px 160px rgba(0,0,0,.62);
+      backdrop-filter: blur(12px);
+      padding: 22px 18px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+      animation: popIn 520ms var(--easeOut) both;
+    }
+    @keyframes popIn{
+      from{ transform: translateY(14px) scale(.985); opacity:0; }
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+    .startCard::before{
+      content:"";
+      position:absolute; inset:-45%;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0) 0 18px,
+        rgba(255,255,255,.22) 18px 20px,
+        rgba(255,255,255,0) 20px 44px
+      );
+      transform: rotate(-16deg) translateX(-60%);
+      opacity:.30;
+      animation: shine 2.8s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes shine{
+      0%{ transform: rotate(-16deg) translateX(-60%); }
+      100%{ transform: rotate(-16deg) translateX(60%); }
+    }
+
+    .logo{ display:flex; flex-direction:column; gap: 12px; align-items:center; justify-content:center; }
+    .logo h1{
+      margin:0;
+      font-size: clamp(30px, 4.6vw, 54px);
+      letter-spacing: 2px;
+      color: rgba(255,255,255,.96);
+      text-shadow: 0 18px 70px rgba(0,0,0,.62), 0 0 42px rgba(61,243,255,.18);
+    }
+    .logo h1 .accent{
+      color: var(--y);
+      text-shadow: 0 18px 70px rgba(0,0,0,.62), 0 0 46px rgba(255,210,90,.18);
+    }
+
+    .subPills{ display:flex; flex-wrap:wrap; justify-content:center; gap: 10px; margin-top: 2px; }
+    .pill{
+      display:inline-flex; gap: 8px; align-items:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 24px 70px rgba(0,0,0,.36);
+      user-select:none;
+      white-space:nowrap;
+      font-size: 12px;
+      opacity:.95;
+    }
+    .dot{
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.70);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: 0 0 18px rgba(61,243,255,.22);
+    }
+
+    .startBtn{
+      margin-top: 14px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-size: 14px;
+      color: rgba(0,0,0,.92);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80)),
+        linear-gradient(180deg, rgba(61,243,255,.28), rgba(61,243,255,.10));
+      border: 1px solid rgba(0,0,0,.18);
+      border-bottom-width: 2px;
+      border-radius: 18px;
+      padding: 14px 22px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 26px 70px rgba(0,0,0,.52), 0 0 0 3px rgba(61,243,255,.12);
+      transition: transform 140ms ease, filter 140ms ease;
+      min-width: 240px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 12px;
+      position:relative;
+      overflow:hidden;
+    }
+    .startBtn:active{ transform: translateY(1px); filter: brightness(.99); }
+
+    .kbd{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.92);
+      font-size: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+    }
+    .hint{ margin: 12px 0 0 0; font-size: 12px; opacity:.88; color: rgba(255,255,255,.90); }
+
+    /* ===================== Hub ===================== */
+    .hubTop{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap: 14px;
+      margin-bottom: 14px;
     }
-
-    .brand{
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      min-width: 280px;
-    }
-
-    .brandTitle{
-      font-size: 18px;
-      color: rgba(255,255,255,.92);
-      letter-spacing: 1px;
-      line-height:1.15;
-    }
-
-    .brandSub{
-      font-size: 12px;
-      color: rgba(255,255,255,.82);
-      opacity:.92;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      width: fit-content;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 8px 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.18);
-      backdrop-filter: blur(6px);
-    }
-
-    .statRow{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      gap: 10px;
-      min-width: 220px;
-    }
-
-    .chip{
-      user-select:none;
-      font-size: 12px;
-      color: rgba(255,255,255,.92);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      padding: 8px 10px;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 12px 28px rgba(0,0,0,.22);
-      display:flex;
-      align-items:center;
-      gap: 10px;
-    }
-
-    .dot{
-      width: 10px;
-      height: 10px;
-      border-radius: 3px;
-      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.15));
-      border: 1px solid rgba(255,255,255,.25);
-      box-shadow: 0 0 18px rgba(68,240,255,.22);
-    }
+    .hudLeft{ display:flex; flex-direction:column; gap: 10px; min-width: 280px; }
+    .hudTitle{ font-size: 12px; display:flex; gap: 10px; align-items:center; flex-wrap:wrap; opacity:.95; }
 
     .bar{
-      width: min(340px, 56vw);
+      width: min(520px, 62vw);
       height: 12px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.25);
       overflow:hidden;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
     }
     .fill{
       height:100%;
       width:0%;
-      background: linear-gradient(90deg, var(--neon1), var(--neon2));
-      box-shadow: 0 0 18px rgba(68,240,255,.30);
-      transition: width 420ms cubic-bezier(.2,.9,.2,1);
+      background: linear-gradient(90deg, var(--c), var(--g));
+      box-shadow: 0 0 18px rgba(61,243,255,.30);
+      transition: width 520ms var(--easeOut);
     }
 
-    .controls{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .hudRight{ display:flex; flex-direction:column; align-items:flex-end; gap: 10px; }
 
     .btnSmall{
-      font-family: var(--mono);
-      font-weight: 800;
+      font-weight: 900;
+      letter-spacing:.7px;
       font-size: 12px;
       color: rgba(255,255,255,.92);
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.14);
       border-bottom-width: 2px;
-      border-radius: 14px;
-      padding: 8px 10px;
+      border-radius: 16px;
+      padding: 10px 12px;
       cursor:pointer;
       user-select:none;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 12px 26px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 22px 50px rgba(0,0,0,.28);
       transition: transform 120ms ease, filter 120ms ease;
+      min-width: 170px;
+      text-align:center;
     }
-    .btnSmall:active{ transform: translateY(1px); filter: brightness(.98); }
+    .btnSmall:active{ transform: translateY(1px); filter: brightness(.99); }
 
-    /* ============================================================
-      Icon Grid (no scroll)
-      9 items => 3x3 grid (auto adapts)
-    ============================================================ */
     .gridWrap{
-      position:relative;
-      border-radius: var(--radius);
-      background: rgba(255,255,255,.06);
+      height: calc(100% - 86px);
+      border-radius: var(--r3);
       border: 1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 26px 60px rgba(0,0,0,.30);
-      padding: 18px;
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 34px 110px rgba(0,0,0,.42);
+      backdrop-filter: blur(12px);
+      position:relative;
       overflow:hidden;
+      padding: 18px;
     }
-
     .gridWrap::before{
       content:"";
-      position:absolute;
-      inset:-20%;
+      position:absolute; inset:-25%;
       background:
-        radial-gradient(420px 320px at 30% 40%, rgba(68,240,255,.18), transparent 60%),
-        radial-gradient(420px 320px at 70% 60%, rgba(255,77,154,.14), transparent 60%),
-        radial-gradient(420px 320px at 50% 10%, rgba(122,255,102,.14), transparent 60%);
-      filter: blur(22px);
-      opacity:.85;
-      animation: breathe 6.5s ease-in-out infinite alternate;
+        radial-gradient(520px 420px at 25% 25%, rgba(61,243,255,.18), transparent 62%),
+        radial-gradient(520px 420px at 78% 70%, rgba(255,79,165,.14), transparent 62%),
+        radial-gradient(520px 420px at 55% 20%, rgba(255,210,90,.12), transparent 62%);
+      filter: blur(24px);
+      opacity:.92;
       pointer-events:none;
     }
-    @keyframes breathe{
-      0%{ transform: scale(1) translateY(0); }
-      100%{ transform: scale(1.06) translateY(-6px); }
-    }
 
-    .grid{
+    .cups{
       position:relative;
       z-index:1;
       display:grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      height: 100%;
+      gap: 16px;
+      height:100%;
+      align-content:start;
+    }
+    @media (max-width: 900px){ .cups{ grid-template-columns: repeat(2, minmax(0,1fr)); } .bar{ width: 70vw; } }
+    @media (max-width: 540px){
+      .cups{ grid-template-columns: 1fr; }
+      .hubTop{ flex-direction:column; align-items:stretch; }
+      .hudRight{ align-items:flex-start; }
+      .btnSmall{ width:100%; }
+      .bar{ width:100%; }
     }
 
-    @media (max-width: 860px){
-      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 520px){
-      .grid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
-      .brand{ min-width: 0; }
-      .bar{ width: 60vw; }
-    }
-
-    /* tile */
-    .tile{
+    .cupBtn{
       position:relative;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap: 10px;
-
-      border-radius: 18px;
-      padding: 14px 14px 12px;
+      border-radius: var(--r2);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 28px 80px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.10);
       cursor:pointer;
       user-select:none;
-
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow:
-        0 18px 36px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.10);
       overflow:hidden;
-      transform: translateZ(0);
-      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-    }
+      padding: 14px;
+      display:grid;
+      grid-template-rows:auto auto auto;
+      gap: 12px;
 
-    .tile::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:
-        radial-gradient(220px 160px at 20% 20%, rgba(68,240,255,.20), transparent 60%),
-        radial-gradient(220px 160px at 80% 80%, rgba(255,206,77,.14), transparent 60%);
-      opacity:.55;
-      filter: blur(10px);
-      pointer-events:none;
-      transition: opacity 160ms ease;
+      transform: translateY(18px) scale(.985);
+      opacity:0;
+      animation: cupIn 640ms var(--easeOut) forwards;
+      transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
     }
+    @keyframes cupIn{ to{ transform: translateY(0) scale(1); opacity:1; } }
 
-    .tile:hover{
+    .cupBtn:hover{
       transform: translateY(-3px);
-      border-color: rgba(68,240,255,.35);
-      box-shadow:
-        0 22px 42px rgba(0,0,0,.28),
-        0 0 0 3px rgba(68,240,255,.12),
-        inset 0 1px 0 rgba(255,255,255,.12);
+      border-color: rgba(61,243,255,.34);
+      box-shadow: 0 36px 100px rgba(0,0,0,.40), 0 0 0 3px rgba(61,243,255,.12), inset 0 1px 0 rgba(255,255,255,.12);
     }
-    .tile:hover::before{ opacity:.85; }
-
-    .tile:active{
-      transform: translateY(-1px) scale(.995);
-      filter: brightness(.99);
+    .cupBtn:active{ transform: translateY(-1px) scale(.995); }
+    .cupBtn::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(220px 160px at 20% 20%, rgba(61,243,255,.20), transparent 62%),
+        radial-gradient(220px 160px at 85% 85%, rgba(255,210,90,.12), transparent 62%);
+      opacity:.60;
+      filter: blur(12px);
+      pointer-events:none;
+      transition: opacity 170ms ease;
     }
+    .cupBtn:hover::before{ opacity:.92; }
 
-    .tileTop{
+    .cupTop{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
+      gap: 12px;
       position:relative;
       z-index:1;
     }
 
-    .iconBadge{
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.22);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.06));
-      box-shadow:
-        0 12px 26px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.18);
-      display:grid;
-      place-items:center;
-      position:relative;
+    .cupIcon{
+      width: 78px; height: 78px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 18px 60px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.10);
       overflow:hidden;
+      flex: 0 0 auto;
     }
+    .cupIcon img{ width:100%; height:100%; object-fit:cover; image-rendering: pixelated; transform: scale(1.02); }
 
-    .iconBadge::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: repeating-linear-gradient(
-        90deg,
-        rgba(255,255,255,.0) 0 10px,
-        rgba(255,255,255,.10) 10px 12px,
-        rgba(255,255,255,.0) 12px 22px
-      );
-      opacity:.40;
-      transform: rotate(-20deg) translateX(-30%);
-    }
-
-    .iconSVG{
-      width: 34px;
-      height: 34px;
-      filter: drop-shadow(0 8px 12px rgba(0,0,0,.25));
-    }
-
-    /* completion stamp */
-    .stamp{
+    .cupStamp{
       display:inline-flex;
       align-items:center;
       gap: 8px;
-      padding: 6px 10px;
+      padding: 8px 10px;
       border-radius: 999px;
-      background: rgba(0,0,0,.20);
-      border: 1px solid rgba(255,255,255,.18);
-      color: rgba(255,255,255,.90);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 50px rgba(0,0,0,.26);
       font-size: 12px;
+      opacity:.95;
       white-space:nowrap;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 10px 24px rgba(0,0,0,.20);
     }
-    .stamp .miniDot{
+    .miniDot{
       width: 10px; height: 10px;
       border-radius: 3px;
       background: rgba(255,255,255,.65);
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 0 18px rgba(68,240,255,.20);
-    }
-    .done .stamp{
-      background: rgba(122,255,102,.14);
-      border-color: rgba(122,255,102,.30);
-      box-shadow: 0 0 0 3px rgba(122,255,102,.10), 0 10px 26px rgba(0,0,0,.22);
-    }
-    .done .stamp .miniDot{
-      background: rgba(122,255,102,.85);
-      box-shadow: 0 0 18px rgba(122,255,102,.35);
-    }
-
-    .tileTitle{
-      position:relative;
-      z-index:1;
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-    }
-    .tileTitle .t{
-      font-size: 16px;
-      color: rgba(255,255,255,.94);
-      letter-spacing: .8px;
-      line-height:1.1;
-    }
-    .tileTitle .s{
-      font-size: 12px;
-      color: rgba(255,255,255,.78);
-      opacity:.95;
-      line-height:1.25;
-    }
-
-    .tileHint{
-      position:relative;
-      z-index:1;
-      margin-top: 6px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-size: 12px;
-      color: rgba(255,255,255,.78);
-      opacity:.92;
-    }
-
-    .kbd{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 2px 7px;
-      border-radius: 10px;
       border: 1px solid rgba(255,255,255,.20);
-      background: rgba(0,0,0,.20);
-      color: rgba(255,255,255,.92);
-      font-size: 12px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
-      margin-left: 6px;
+      box-shadow: 0 0 18px rgba(61,243,255,.20);
     }
 
-    .footer{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 12px;
-      padding: 6px 2px;
-      color: rgba(255,255,255,.75);
-      font-size: 12px;
-      opacity:.95;
+    .done .cupStamp{
+      background: rgba(125,255,106,.14);
+      border-color: rgba(125,255,106,.28);
+      box-shadow: 0 0 0 3px rgba(125,255,106,.10), 0 18px 50px rgba(0,0,0,.28);
+    }
+    .done .miniDot{ background: rgba(125,255,106,.85); box-shadow: 0 0 18px rgba(125,255,106,.35); }
+
+    .cupTitle{ display:flex; flex-direction:column; gap: 6px; padding: 0 2px; position:relative; z-index:1; }
+    .cupTitle .t{ font-size: 16px; letter-spacing: 1px; color: rgba(255,255,255,.95); line-height: 1.1; }
+    .cupTitle .s{ font-size: 12px; opacity:.82; color: rgba(255,255,255,.88); line-height: 1.35; }
+
+    .cupFooter{
+      display:flex; justify-content:space-between; align-items:center;
+      font-size: 12px; opacity:.86; color: rgba(255,255,255,.86);
+      position:relative; z-index:1;
+      margin-top: 2px;
     }
 
-    /* ============================================================
-      POPUP “SEITE”
-    ============================================================ */
+    /* ===================== Modal ===================== */
     .overlay{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       display:none;
-      align-items:center;
-      justify-content:center;
+      align-items:center; justify-content:center;
       padding: 18px;
-      background: rgba(0,0,0,.62);
+      background: rgba(0,0,0,.72);
       z-index: 9999;
     }
     .overlay.show{ display:flex; }
 
     .modal{
-      width: min(980px, 100%);
-      height: min(680px, 86vh);
-      border-radius: 26px;
-      position:relative;
+      width: min(1060px, 100%);
+      height: min(720px, 86vh);
+      border-radius: var(--r3);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 52px 150px rgba(0,0,0,.66);
       overflow:hidden;
-      transform: translateY(14px) scale(.985);
-      opacity: 0;
-      animation: pop 210ms cubic-bezier(.2,.9,.2,1) forwards;
-      box-shadow: 0 40px 90px rgba(0,0,0,.45);
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.06);
-      backdrop-filter: blur(10px);
+      position:relative;
+      transform: translateY(16px) scale(.985);
+      opacity:0;
+      animation: pop 260ms var(--easeOut) forwards;
     }
-    @keyframes pop{
-      to{ transform: translateY(0) scale(1); opacity:1; }
-    }
+    @keyframes pop{ to{ transform: translateY(0) scale(1); opacity:1; } }
 
-    .modalFX{
-      position:absolute;
-      inset:-25%;
+    .modal::before{
+      content:"";
+      position:absolute; inset:-30%;
       background:
-        radial-gradient(520px 420px at 25% 25%, rgba(68,240,255,.22), transparent 60%),
-        radial-gradient(520px 420px at 75% 75%, rgba(255,77,154,.16), transparent 60%),
-        radial-gradient(520px 420px at 55% 20%, rgba(255,206,77,.14), transparent 60%);
-      filter: blur(26px);
+        radial-gradient(620px 480px at 25% 25%, rgba(61,243,255,.20), transparent 62%),
+        radial-gradient(620px 480px at 78% 68%, rgba(255,210,90,.10), transparent 62%),
+        radial-gradient(620px 480px at 70% 26%, rgba(255,79,165,.14), transparent 62%),
+        radial-gradient(620px 480px at 48% 88%, rgba(125,255,106,.12), transparent 62%);
+      filter: blur(28px);
       opacity:.95;
       animation: breathe 6s ease-in-out infinite alternate;
       pointer-events:none;
@@ -580,136 +600,111 @@
     }
 
     .modalHeader{
+      border-radius: var(--r2);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.20);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      padding: 14px 14px 12px;
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap: 12px;
-      padding: 14px 14px 12px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.18);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
     }
 
-    .modalTitle{
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      min-width:0;
-    }
-
-    .modalTitle .h{
+    .modalTitle{ display:flex; flex-direction:column; gap: 8px; min-width:0; }
+    .modalTitle h2{
       margin:0;
       font-size: 18px;
-      color: rgba(255,255,255,.95);
       letter-spacing: 1px;
-      line-height:1.15;
-      white-space: nowrap;
+      color: rgba(255,255,255,.95);
+      white-space:nowrap;
       overflow:hidden;
-      text-overflow: ellipsis;
+      text-overflow:ellipsis;
     }
 
-    .modalTitle .meta{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      flex-wrap:wrap;
-      color: rgba(255,255,255,.82);
-      font-size: 12px;
-      opacity:.95;
-    }
-
-    .pill{
+    .metaRow{ display:flex; flex-wrap:wrap; gap: 10px; align-items:center; font-size: 12px; opacity:.92; }
+    .pill2{
       display:inline-flex;
-      align-items:center;
       gap: 8px;
-      padding: 6px 10px;
+      align-items:center;
+      padding: 8px 10px;
       border-radius: 999px;
       background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
       user-select:none;
-    }
-    .pill .pDot{
-      width: 10px; height: 10px; border-radius: 3px;
-      background: rgba(255,255,255,.70);
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 0 18px rgba(68,240,255,.25);
+      white-space:nowrap;
     }
 
-    .closeX{
-      cursor:pointer;
-      user-select:none;
-      border-radius: 16px;
-      padding: 8px 10px;
+    .closeBtn{
+      font-weight: 900;
+      letter-spacing:.8px;
+      font-size: 12px;
       color: rgba(255,255,255,.92);
       background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 12px 24px rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.14);
+      border-bottom-width: 2px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      cursor:pointer;
+      user-select:none;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
       transition: transform 120ms ease, filter 120ms ease;
-      font-size: 12px;
-      font-weight: 900;
+      min-width: 140px;
     }
-    .closeX:active{ transform: translateY(1px); filter: brightness(.98); }
+    .closeBtn:active{ transform: translateY(1px); filter: brightness(.99); }
 
     .modalBody{
-      position:relative;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--r3);
+      border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.08);
-      box-shadow:
-        0 18px 44px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.08);
+      box-shadow: 0 34px 100px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08);
       overflow:hidden;
-      display:grid;
-      grid-template-columns: 1fr;
-      align-items:stretch;
+      position:relative;
     }
 
-    /* type area */
-    .typeArea{
-      position:relative;
+    .paper{
       height:100%;
+      padding: 16px;
       display:grid;
       grid-template-rows: auto 1fr;
-      gap: 10px;
-      padding: 16px;
-    }
-
-    .typeTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
       gap: 12px;
-      color: rgba(255,255,255,.85);
-      font-size: 12px;
-      opacity:.95;
     }
 
-    .typeBox{
-      border-radius: 18px;
-      background: rgba(255,255,255,.88);
+    .paperTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      font-size: 12px;
+      opacity:.90;
+    }
+
+    .paperBox{
+      height:100%;
+      border-radius: var(--r2);
+      background: var(--paper);
       border: 2px solid rgba(0,0,0,.18);
-      box-shadow:
-        0 18px 40px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.65);
+      box-shadow: 0 26px 80px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.65);
       padding: 14px;
       position:relative;
       overflow:hidden;
+      transform-origin: 50% 50%;
+      animation: paperFloat 5.2s ease-in-out infinite alternate;
     }
-
-    /* pixel paper texture */
-    .typeBox::before{
+    @keyframes paperFloat{
+      0%{ transform: translateY(0); }
+      100%{ transform: translateY(-4px); }
+    }
+    .paperBox::before{
       content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65)),
-        radial-gradient(rgba(0,0,0,.08) 1px, transparent 1px);
-      background-size: auto, 9px 9px;
-      opacity:.22;
-      pointer-events:none;
+      position:absolute; inset:0;
+      background: radial-gradient(rgba(0,0,0,.08) 1px, transparent 1px);
+      background-size: 10px 10px;
+      opacity:.18;
       mix-blend-mode: multiply;
+      pointer-events:none;
     }
 
     .typed{
@@ -717,78 +712,64 @@
       z-index:1;
       white-space: pre-wrap;
       font-size: 14px;
-      line-height: 1.65;
-      color: rgba(0,0,0,.90);
+      line-height: 1.7;
+      color: var(--ink);
     }
 
-    /* birthday twins image (square) */
-    .imgRow{
-      margin-top: 12px;
-      display:flex;
+    .twinRow{
+      margin-top: 14px;
+      display:none;
       gap: 12px;
       flex-wrap:wrap;
       align-items:flex-start;
       position:relative;
       z-index:1;
     }
-    .squareImg{
+    .twinSquare{
       width: 180px;
       height: 180px;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 2px solid rgba(0,0,0,.18);
-      background: rgba(255,255,255,.9);
-      box-shadow: 0 18px 40px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.6);
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 26px 70px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.65);
       overflow:hidden;
-      flex: 0 0 auto;
     }
-    .squareImg img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      image-rendering: pixelated;
-      display:block;
-    }
+    .twinSquare img{ width:100%; height:100%; object-fit:cover; image-rendering: pixelated; }
 
     .modalFooter{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 12px;
-      padding: 12px 6px 4px;
+      padding: 6px 2px 0;
     }
-
-    .footerLeft{
-      color: rgba(255,255,255,.80);
+    .footerNote{
       font-size: 12px;
-      opacity:.95;
+      opacity:.88;
+      color: rgba(255,255,255,.88);
       display:flex;
+      gap: 10px;
+      align-items:center;
       flex-wrap:wrap;
-      gap: 10px;
-      align-items:center;
-    }
-
-    .footerRight{
-      display:flex;
-      gap: 10px;
-      align-items:center;
     }
 
     .btn{
-      font-family: var(--mono);
       font-weight: 900;
-      letter-spacing: .6px;
+      letter-spacing:.9px;
       font-size: 12px;
-      color: rgba(0,0,0,.90);
-      background: rgba(255,255,255,.92);
+      color: rgba(0,0,0,.92);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80)),
+        linear-gradient(180deg, rgba(61,243,255,.25), rgba(61,243,255,.10));
       border: 1px solid rgba(0,0,0,.18);
       border-bottom-width: 2px;
-      border-radius: 16px;
-      padding: 10px 14px;
+      border-radius: 18px;
+      padding: 12px 14px;
       cursor:pointer;
       user-select:none;
-      box-shadow: 0 18px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.65);
+      box-shadow: 0 22px 66px rgba(0,0,0,.38), 0 0 0 3px rgba(61,243,255,.10);
       transition: transform 120ms ease, filter 120ms ease;
-      min-width: 120px;
+      min-width: 150px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -796,66 +777,43 @@
     }
     .btn:active{ transform: translateY(1px); filter: brightness(.99); }
 
-    .btnPrimary{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82)),
-        linear-gradient(180deg, rgba(68,240,255,.25), rgba(68,240,255,.10));
-      color: rgba(0,0,0,.92);
-    }
-
     .btnGhost{
       color: rgba(255,255,255,.92);
       background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.14);
       border-bottom-width: 2px;
-      backdrop-filter: blur(6px);
+      box-shadow: 0 22px 56px rgba(0,0,0,.32);
+      backdrop-filter: blur(10px);
     }
 
-    /* Thinking overlay inside modal */
+    /* ===================== Thinking Overlay (micro) ===================== */
     .thinking{
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       display:none;
       align-items:center;
       justify-content:center;
-      background: rgba(0,0,0,.40);
-      z-index: 5;
+      background: rgba(0,0,0,.45);
+      z-index: 6;
     }
     .thinking.show{ display:flex; }
-
     .thinkCard{
-      width: min(340px, 88%);
-      border-radius: 20px;
+      width: min(360px, 88%);
+      border-radius: var(--r3);
       background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 30px 70px rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 40px 120px rgba(0,0,0,.50);
       padding: 16px;
-      color: rgba(255,255,255,.92);
       text-align:center;
     }
-    .thinkCard .t1{
-      font-size: 14px;
-      margin:0 0 6px 0;
-      letter-spacing: .9px;
-    }
-    .thinkCard .t2{
-      font-size: 12px;
-      opacity:.88;
-      margin:0;
-    }
-    .dots{
-      display:flex;
-      justify-content:center;
-      gap: 8px;
-      margin-top: 12px;
-    }
+    .thinkCard .t1{ margin:0 0 6px 0; font-size: 14px; letter-spacing: 1px; color: rgba(255,255,255,.95); }
+    .thinkCard .t2{ margin:0; font-size: 12px; opacity:.88; color: rgba(255,255,255,.90); }
+    .dots{ display:flex; justify-content:center; gap: 8px; margin-top: 12px; }
     .dp{
-      width: 10px; height: 10px;
-      border-radius: 3px;
+      width: 10px; height: 10px; border-radius: 3px;
       background: rgba(255,255,255,.72);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 0 18px rgba(68,240,255,.25);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 0 18px rgba(61,243,255,.25);
       animation: dp 700ms infinite ease-in-out;
     }
     .dp:nth-child(2){ animation-delay: 120ms; }
@@ -865,329 +823,239 @@
       50%{ transform: translateY(-6px); opacity:1; }
     }
 
-    /* ============================================================
-      Victory Overlay
-    ============================================================ */
+    /* ===================== Game Area ===================== */
+    .gameArea{ margin-top: 14px; display:none; gap: 10px; flex-direction:column; position:relative; z-index:1; }
+    .gStats{
+      display:flex; gap: 10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      font-size: 12px; color: rgba(0,0,0,.85);
+    }
+    .gChip{
+      padding: 8px 10px; border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+      white-space:nowrap;
+    }
+    #jumpGame{
+      width: 100%;
+      height: 320px;
+      border-radius: var(--r2);
+      border: 2px solid rgba(0,0,0,.18);
+      background: linear-gradient(180deg, #e9f6ff, #cfeaff);
+      box-shadow: 0 26px 80px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.65);
+      image-rendering: pixelated;
+      display:block;
+    }
+    .gHint{ font-size: 12px; color: rgba(0,0,0,.88); line-height:1.55; opacity:.95; }
+
+    /* ===================== Victory ===================== */
     .victory{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       display:none;
-      align-items:center;
-      justify-content:center;
+      align-items:center; justify-content:center;
       padding: 18px;
-      background: rgba(0,0,0,.72);
+      background: rgba(0,0,0,.80);
       z-index: 10000;
     }
     .victory.show{ display:flex; }
 
     .vicCard{
-      width: min(980px, 100%);
-      height: min(620px, 84vh);
-      border-radius: 28px;
-      border: 1px solid rgba(255,255,255,.18);
+      width: min(1060px, 100%);
+      height: min(720px, 86vh);
+      border-radius: var(--r3);
+      border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.08);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 44px 110px rgba(0,0,0,.55);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 56px 160px rgba(0,0,0,.70);
       overflow:hidden;
       position:relative;
     }
-
-    .vicFX{
-      position:absolute;
-      inset:-25%;
+    .vicCard::before{
+      content:"";
+      position:absolute; inset:-30%;
       background:
-        radial-gradient(520px 520px at 20% 30%, rgba(122,255,102,.22), transparent 60%),
-        radial-gradient(520px 520px at 80% 40%, rgba(68,240,255,.18), transparent 60%),
-        radial-gradient(520px 520px at 50% 85%, rgba(255,206,77,.16), transparent 60%);
-      filter: blur(28px);
+        radial-gradient(620px 520px at 25% 30%, rgba(125,255,106,.18), transparent 62%),
+        radial-gradient(620px 520px at 80% 40%, rgba(61,243,255,.16), transparent 62%),
+        radial-gradient(620px 520px at 55% 85%, rgba(255,210,90,.12), transparent 62%);
+      filter: blur(30px);
       opacity:.95;
       animation: breathe 6s ease-in-out infinite alternate;
       pointer-events:none;
     }
 
     .vicInner{
-      position:relative;
-      z-index:1;
+      position:relative; z-index:1;
       height:100%;
       display:grid;
       grid-template-rows: auto 1fr auto;
       gap: 14px;
-      padding: 18px;
+      padding: 16px;
     }
-
     .vicTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 14px 14px 12px;
-      border-radius: 22px;
-      background: rgba(0,0,0,.20);
-      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--r2);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      padding: 14px 14px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap: 12px;
     }
-    .vicTop h2{
-      margin:0;
-      font-size: 18px;
-      color: rgba(255,255,255,.95);
-      letter-spacing: 1px;
-    }
+    .vicTop h2{ margin:0; font-size: 18px; letter-spacing: 1px; color: rgba(255,255,255,.95); }
 
     .vicBody{
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--r3);
+      border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.08);
-      box-shadow: 0 24px 60px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.08);
-      overflow:hidden;
+      box-shadow: 0 34px 110px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08);
       display:grid;
       place-items:center;
-      padding: 16px;
+      padding: 18px;
       position:relative;
+      overflow:hidden;
     }
-
     .vicPaper{
-      width: min(720px, 96%);
-      border-radius: 22px;
+      width: min(780px, 96%);
+      border-radius: var(--r3);
       background: rgba(255,255,255,.92);
       border: 2px solid rgba(0,0,0,.18);
-      box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.65);
+      box-shadow: 0 36px 130px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,255,255,.65);
       padding: 18px;
       text-align:center;
       position:relative;
       overflow:hidden;
+      color: rgba(0,0,0,.92);
+      animation: popIn 520ms var(--easeOut) both;
     }
-
     .vicPaper::before{
       content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(rgba(0,0,0,.08) 1px, transparent 1px);
+      position:absolute; inset:0;
+      background: radial-gradient(rgba(0,0,0,.08) 1px, transparent 1px);
       background-size: 10px 10px;
       opacity:.18;
       mix-blend-mode: multiply;
       pointer-events:none;
     }
+    .vicMsg{ position:relative; z-index:1; margin: 0; font-size: 16px; line-height: 1.7; white-space: pre-wrap; }
 
-    .vicMsg{
-      position:relative;
-      z-index:1;
-      font-size: 16px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      color: rgba(0,0,0,.92);
-      margin: 0;
-    }
-
-    .vicImg{
-      margin: 14px auto 0;
-      width: 180px;
-      height: 180px;
-      border-radius: 18px;
-      border: 2px solid rgba(0,0,0,.18);
-      overflow:hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.6);
-      background: rgba(255,255,255,.96);
-      display:none; /* only show if cup.png loads */
-      position:relative;
-      z-index:1;
-    }
-    .vicImg img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      image-rendering: pixelated;
-      display:block;
-    }
-
-    .vicBottom{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 12px;
-      padding: 10px 4px 0;
-      color: rgba(255,255,255,.80);
-      font-size: 12px;
-      opacity:.95;
-    }
-
-    /* confetti canvas */
     #confetti{
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       pointer-events:none;
       opacity:.95;
     }
 
-    /* ============================================================
-      GAME CANVAS (Pilz-Cup)
-    ============================================================ */
-    .gameArea{
-      position:relative;
-      z-index:1;
-      margin-top: 12px;
-      display:grid;
-      grid-template-rows: auto auto;
-      gap: 10px;
-    }
-    .gameStats{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      font-size: 12px;
-      color: rgba(0,0,0,.85);
-      position:relative;
-      z-index:1;
-    }
-    .gChip{
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.90);
-      border: 1px solid rgba(0,0,0,.16);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
-      white-space:nowrap;
-    }
-
-    canvas#jumpGame{
-      width: 100%;
-      height: 300px;
-      border-radius: 18px;
-      border: 2px solid rgba(0,0,0,.18);
-      background:
-        linear-gradient(180deg, #e9f6ff, #cfeaff);
-      box-shadow: 0 24px 60px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.65);
-      image-rendering: pixelated;
-      display:block;
-    }
-
-    .gameHint{
-      font-size: 12px;
-      color: rgba(0,0,0,.86);
-      opacity:.95;
-      line-height:1.55;
-      position:relative;
-      z-index:1;
-    }
-
-    /* ============================================================
-      Focus outlines (keyboard)
-    ============================================================ */
-    .tile:focus-visible,
-    .btn:focus-visible,
-    .btnSmall:focus-visible,
-    .closeX:focus-visible{
-      outline: 3px solid rgba(68,240,255,.55);
-      outline-offset: 3px;
+    /* Focus visible */
+    .startBtn:focus-visible, .btnSmall:focus-visible, .cupBtn:focus-visible, .btn:focus-visible, .closeBtn:focus-visible{
+      outline: 3px solid rgba(61,243,255,.55);
+      outline-offset: 4px;
     }
   </style>
 </head>
 
 <body>
   <div class="bgFX" aria-hidden="true">
+    <div class="grid"></div>
     <div class="blob b1"></div>
     <div class="blob b2"></div>
     <div class="blob b3"></div>
-
     <div class="stars" id="stars"></div>
     <div class="scan"></div>
+    <div class="grain"></div>
   </div>
 
-  <!-- HUB -->
-  <main class="hub px" id="hub">
-    <header class="topBar">
-      <div class="brand">
-        <div class="brandTitle">MKDS NOSTALGIE — GIFT HUB</div>
-        <div class="brandSub">
-          <span>Icons klicken → Popup</span>
-          <span>•</span>
-          <span>Weiter/Beenden</span>
-          <span>•</span>
-          <span>Typewriter</span>
-        </div>
-      </div>
+  <div class="app px">
+    <div class="stage" id="stage">
 
-      <div class="statRow">
-        <div class="chip">
-          <span class="dot"></span>
-          <span id="progText">Fortschritt: 0 / 0</span>
-        </div>
-        <div class="bar" aria-label="Fortschrittsbalken">
-          <div class="fill" id="progFill"></div>
-        </div>
-        <div class="controls">
-          <button class="btnSmall px" id="btnSound" type="button" title="Sound an/aus (M)">Sound: <span id="soundLabel">AN</span></button>
-          <button class="btnSmall px" id="btnReset" type="button" title="Reset (R)">Reset</button>
-        </div>
-      </div>
-    </header>
+      <!-- START SCREEN -->
+      <section class="screen show" id="screenStart" aria-label="Start Screen">
+        <div class="start">
+          <video class="startVideo" id="startVideo" muted playsinline loop preload="metadata">
+            <source src="Mario Kart DS - Rainbow Road.mp4" type="video/mp4" />
+          </video>
+          <div class="startOverlay"></div>
 
-    <section class="gridWrap" aria-label="Insider Hub">
-      <div class="grid" id="grid">
-        <!-- tiles injected by JS -->
-      </div>
-    </section>
+          <div class="startCard px">
+            <div class="logo">
+              <h1><span class="accent">TWIN</span> KART DS</h1>
+              <div class="subPills">
+                <span class="pill"><span class="dot"></span> Nostalgie One-Sider</span>
+                <span class="pill"><span class="dot"></span> Music: <span class="kbd">M</span></span>
+                <span class="pill"><span class="dot"></span> Reset: <span class="kbd">R</span></span>
+              </div>
 
-    <footer class="footer">
-      <div>
-        <span>Keys:</span>
-        <span class="kbd">1–9</span> öffnen
-        <span class="kbd">Enter</span> weiter
-        <span class="kbd">Esc</span> beenden
-        <span class="kbd">M</span> sound
-        <span class="kbd">R</span> reset
-      </div>
-      <div id="smallStatus">Alles verteilt • Kein Scroll • Fokus auf Icons</div>
-    </footer>
-  </main>
+              <button class="startBtn px" id="btnStart" type="button">START ▶</button>
+              <p class="hint px">Tipp: <span class="kbd">Enter</span> geht auch • Musik startet erst nach START</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HUB SCREEN -->
+      <section class="screen" id="screenHub" aria-label="Cups Screen">
+        <div class="hubTop">
+          <div class="hudLeft">
+            <div class="hudTitle">
+              <span class="pill"><span class="dot"></span><span id="progText">Fortschritt: 0 / 0</span></span>
+              <span class="pill"><span class="dot"></span><span id="musicText">Music: AUS</span></span>
+              <span class="pill"><span class="dot"></span><span>Keys: <span class="kbd">1..9</span></span></span>
+            </div>
+            <div class="bar"><div class="fill" id="progFill"></div></div>
+          </div>
+
+          <div class="hudRight">
+            <button class="btnSmall px" id="btnMusic" type="button">MUSIC TOGGLE (M)</button>
+            <button class="btnSmall px" id="btnReset" type="button">RESET (R)</button>
+          </div>
+        </div>
+
+        <div class="gridWrap">
+          <div class="cups" id="cups"></div>
+        </div>
+      </section>
+    </div>
+  </div>
 
   <!-- MODAL -->
   <div class="overlay" id="overlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modalFX" aria-hidden="true"></div>
-
       <div class="modalInner">
         <div class="modalHeader">
           <div class="modalTitle">
-            <h1 class="h" id="modalTitle">Titel</h1>
-            <div class="meta">
-              <span class="pill"><span class="pDot"></span><span id="modalMeta">1 / 1</span></span>
-              <span class="pill"><span class="pDot"></span><span id="modalType">TEXT</span></span>
-              <span class="pill"><span class="pDot"></span><span id="modalDone">Status: offen</span></span>
+            <h2 id="modalTitle">Titel</h2>
+            <div class="metaRow">
+              <span class="pill2"><span class="dot"></span><span id="metaStep">1 / 1</span></span>
+              <span class="pill2"><span class="dot"></span><span id="metaType">TEXT</span></span>
+              <span class="pill2"><span class="dot"></span><span id="metaStatus">Status: offen</span></span>
             </div>
           </div>
-          <button class="closeX px" id="btnClose" type="button">BEENDEN ✕</button>
+          <button class="closeBtn px" id="btnBeendenTop" type="button">BEENDEN ✕</button>
         </div>
 
         <div class="modalBody">
-          <div class="typeArea">
-            <div class="typeTop">
-              <div id="typeHint">Satz wird getippt… (klick oder Enter = sofort fertig)</div>
-              <div id="typeSpeed">⌁</div>
+          <div class="paper">
+            <div class="paperTop">
+              <div id="typeHint">Satz wird getippt… (klick/Enter = sofort fertig)</div>
+              <div>Keys: <span class="kbd">Enter</span> / <span class="kbd">Esc</span></div>
             </div>
 
-            <div class="typeBox">
+            <div class="paperBox" id="paperBox">
               <div class="typed px" id="typed"></div>
 
-              <!-- birthday twins image -->
-              <div class="imgRow" id="imgRow" style="display:none;">
-                <div class="squareImg" id="twinBox" style="display:none;">
+              <div class="twinRow" id="twinRow">
+                <div class="twinSquare" id="twinSquare">
                   <img id="twinImg" src="twin.png" alt="twin.png" />
                 </div>
               </div>
 
-              <!-- game area -->
-              <div class="gameArea" id="gameArea" style="display:none;">
-                <div class="gameStats">
+              <div class="gameArea" id="gameArea">
+                <div class="gStats">
                   <span class="gChip">Score: <b id="gScore">0</b></span>
                   <span class="gChip">Best: <b id="gBest">0</b></span>
                   <span class="gChip">Status: <b id="gState">READY</b></span>
                 </div>
-                <canvas id="jumpGame" width="980" height="420" aria-label="Pilz-Cup Jump Game"></canvas>
-                <div class="gameHint px">
-                  <b>Steuerung:</b> Space / ↑ / Klick = springen • <b>Ziel:</b> so lange wie möglich über Hindernisse • Crash = Game Over.<br>
-                  (Runner ist „67“, so wie du wolltest.)
+                <canvas id="jumpGame" width="980" height="420"></canvas>
+                <div class="gHint px">
+                  <b>Steuerung:</b> Space / ↑ / Klick = springen • Crash = Game Over • Restart: Space/↑/Klick<br>
+                  Runner ist „67“.
                 </div>
               </div>
             </div>
@@ -1195,23 +1063,22 @@
         </div>
 
         <div class="modalFooter">
-          <div class="footerLeft">
-            <span class="pill"><span class="pDot"></span> Weiter zeigt den nächsten Satz (falls vorhanden)</span>
+          <div class="footerNote">
+            <span class="pill2"><span class="dot"></span> WEITER erscheint nur, wenn es mehr als 1 Satz gibt</span>
           </div>
-          <div class="footerRight">
-            <button class="btn btnGhost px" id="btnEnd" type="button">BEENDEN</button>
-            <button class="btn btnPrimary px" id="btnNext" type="button">WEITER</button>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn btnGhost px" id="btnBeenden" type="button">BEENDEN</button>
+            <button class="btn px" id="btnWeiter" type="button">WEITER</button>
           </div>
         </div>
-      </div>
 
-      <!-- thinking overlay -->
-      <div class="thinking" id="thinking">
-        <div class="thinkCard px">
-          <p class="t1">Thinking…</p>
-          <p class="t2">lade den Moment…</p>
-          <div class="dots" aria-hidden="true">
-            <div class="dp"></div><div class="dp"></div><div class="dp"></div>
+        <div class="thinking" id="thinking">
+          <div class="thinkCard px">
+            <p class="t1">Thinking…</p>
+            <p class="t2">lade den Moment…</p>
+            <div class="dots" aria-hidden="true">
+              <div class="dp"></div><div class="dp"></div><div class="dp"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1222,195 +1089,158 @@
   <div class="victory" id="victory" aria-hidden="true">
     <div class="vicCard" role="dialog" aria-modal="true" aria-labelledby="vicTitle">
       <canvas id="confetti" width="1200" height="700"></canvas>
-      <div class="vicFX" aria-hidden="true"></div>
-
       <div class="vicInner">
         <div class="vicTop">
           <h2 class="px" id="vicTitle">CUP GEWONNEN</h2>
-          <button class="closeX px" id="btnCloseVictory" type="button">BEENDEN ✕</button>
+          <button class="closeBtn px" id="btnVictoryClose" type="button">BEENDEN ✕</button>
         </div>
 
         <div class="vicBody">
           <div class="vicPaper px">
             <p class="vicMsg" id="vicMsg">Bilcan glückwunsch du hast Den Cup gewonnen</p>
-            <div class="vicImg" id="cupBox">
-              <img id="cupImg" src="cup.png" alt="cup.png" />
-            </div>
           </div>
         </div>
 
-        <div class="vicBottom">
-          <div>Wenn du willst: <span class="kbd">R</span> reset</div>
-          <div>Sound: <span id="vicSound">AN</span></div>
+        <div class="footerNote" style="padding:0 6px 8px; opacity:.92;">
+          Tipp: <span class="kbd">R</span> reset • <span class="kbd">M</span> music
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Background Music -->
+  <audio id="bgm" src="rainbowRoad.mp3" loop preload="auto"></audio>
+
   <script>
     /* ============================================================
-      DATA — deine Texte, möglichst unverändert
-      Rule: "mehr als ein satz" => WEITER steps.
-      Praktisch: wir splitten in Segmente pro Zeile (nicht aggressive Punkt-Splitting),
-      damit dein Schreibstil bleibt.
+      DATA — your texts (minimal changes, only sentence splitting)
     ============================================================ */
-
     const ITEMS = [
-      {
-        id:"nonchalant",
-        title:"nonchalant",
-        subtitle:"als ich dich gekonnt ignoriert habe…",
-        icon:"spark",
-        type:"text",
-        segments: [
-          "als ich dich gekonnt ignoriert habe und kaum wahrgenommen habe hast du mich für nonchalant gehalten"
+      { id:"nonchalant", title:"nonchalant", subtitle:"erste encounter vibes…", icon:"nonchalant.jpg", type:"text",
+        segments:[
+          "Als wir uns das erste mal encounterd sind und ich dich gekonnt ignoriert habe und kaum wahrgenommen habe.",
+          "Du  hast du mich für nonchalant gehalten ,"
         ]
       },
-      {
-        id:"sideeye",
-        title:"sideeye",
-        subtitle:"da dachtest du ich bin ne zicke…",
-        icon:"eye",
-        type:"text",
-        segments: [
-          "da dachtest du ich bin ne zicke (ich konnte 67 nicht ab )",
-          "von wo soll ich wissen das du noch relevant sein wirst"
+      { id:"sideeye", title:"sideeye", subtitle:"67 konnte ich nicht ab…", icon:"sideeye.jpg", type:"text",
+        segments:[
+          "da dachtest du ich bin ne zicke (ich konnte 67 nicht ab ).",
+          "Von wo soll ich wissen das du noch relevant sein wirst,"
         ]
       },
-      {
-        id:"birthday_twins",
-        title:"birthday twins",
-        subtitle:"erste mal das mein geburtag wieder relevant war…",
-        icon:"cake",
-        type:"text",
-        showTwinImage:true, // twin.png
-        segments: [
-          "erste mal das mein geburtag wieder relevant war",
-          "(du hypersenible)",
-          "schätze lowkey das du mein caretaken apprecieates",
-          "ich hinterfrage nicht aber checke wie du dich fühlst (glaub ich zu mindestens manschmal)"
+      { id:"birthday_twins", title:"birthday twins", subtitle:"mein geburtag wieder relevant…", icon:"twins.jpg", type:"text", showTwin:true,
+        segments:[
+          "Das war das erste mal das mein geburtag wieder relevant war.",
+          "(du hypersenible).",
+          "schätze lowkey das du mein caretaken im Krativlabor apprecieates.",
+          "manchmal  hinterfrage ich nicht aber checke wie du dich fühlst (glaub ich zu mindestens ) ,"
         ]
       },
-      {
-        id:"toad_yoshi",
-        title:"toad & yoshi",
-        subtitle:"mario party duo runde…",
-        icon:"mush",
-        type:"text",
-        segments: [
-          "wann kann man behaupten das man mit ner frau mario party gezockt hat auch wenn du das 1vs 1 gewonnen hast war unser duo runde mir sehr viel spaß gemacht"
+      { id:"toad_yoshi", title:"toad & yoshi", subtitle:"mario party duo…", icon:"toadyoshi.jpg", type:"text",
+        segments:[
+          "Wann kann man behaupten das man mit einer frau mario party gezockt hat auch wenn du das 1vs 1 gewonnen hast ,",
+          "Mir hat unsere duo runde sehr spaß gemacht,"
         ]
       },
-      {
-        id:"67",
-        title:"67",
-        subtitle:"six seveeeen…",
-        icon:"num",
-        type:"text",
-        segments: [
-          "six seveeeen (gott weiß wie weit es dazu kam das ich das jetzt sage)"
+      { id:"sixseven", title:"67", subtitle:"six seveeeen…", icon:"67.jpg", type:"text",
+        segments:[
+          "six seveeeen (gott weiß wie weit es dazu kam das ich das jetzt sage),"
         ]
       },
-      {
-        id:"suessli",
-        title:"süßli müsli",
-        subtitle:"Lowkey…",
-        icon:"heart",
-        type:"text",
-        segments: [
-          "Lowkey wir haben echt coole erinerungen zusammen"
+      { id:"suessli", title:"süßli müsli", subtitle:"coole erinnerungen…", icon:"süslimüsli.jpg", type:"text",
+        segments:[
+          "Lowkey wir haben echt coole erinerungen zusammen,"
         ]
       },
-      {
-        id:"sami_salma",
-        title:"Sami und salma",
-        subtitle:"düsseldorf — salma supa & sami strammer bira…",
-        icon:"people",
-        type:"text",
-        segments: [
-          "Bin den beiden echt dankbar das wir so lachkik mit den beiden haben konnten salma supa und sami strammer bira (düsseldorf)",
-          "mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spaß haben"
+      { id:"ss", title:"Sami und salma", subtitle:"düsseldorf promenade…", icon:"ss.jpg", type:"text",
+        segments:[
+          "Bin den beiden echt dankbar das wir so lachkik mit den beiden haben konnten .",
+          "salma supa frau der kuchen war so bombe .",
+          "und sami strammer bira (düsseldorf  promenade).",
+          "mit dir chill ich gern ich einem auto und guck dennen zu wie die wie kinder spaß haben auf einem parkplatz ,"
         ]
       },
-      {
-        id:"tishtennis",
-        title:"tishtennis",
-        subtitle:"schläger beansprucht…",
-        icon:"ping",
-        type:"text",
-        segments: [
+      { id:"tishtennis", title:"tishtennis", subtitle:"schläger beansprucht…", icon:"tischtennis.jpg", type:"text",
+        segments:[
           "hast meienen schläger beansprucht"
         ]
       },
-      {
-        id:"pilz_cup",
-        title:"Pilz-Cup",
-        subtitle:"Jump Game statt Text",
-        icon:"run",
-        type:"game",
-        segments: [
-          "hier kommt stat eines text ein kleines minigame"
+      { id:"tortuga", title:"Tortuga-Cup", subtitle:"67 Jump Game", icon:"tortuga.jpg", type:"game",
+        segments:[
+          "hier kommt das game von vorhin also 67 jumpen wie dieser dino von google"
         ]
-      }
+      },
     ];
 
     /* ============================================================
-      STORAGE
+      Storage
     ============================================================ */
-    const KEY_PROGRESS = "mkds_gift_progress_v2";
-    const KEY_SETTINGS = "mkds_gift_settings_v2";
-    const KEY_GAMEBEST = "mkds_gift_jump_best_v1";
+    const KEY_PROGRESS = "twinkart_progress_final_v1";
+    const KEY_GAMEBEST = "twinkart_jump_best_final_v1";
+    const KEY_SETTINGS = "twinkart_settings_final_v1";
 
     const state = {
+      started: false,
       openId: null,
       segIndex: 0,
-      typedBusy: false,
-      typedSkip: false,
+      typing: false,
+      skip: false,
       progress: {},
-      settings: { sound:true }
+      musicOn: true,
+      gameTouched: false
     };
 
     function load(){
-      try{
-        const p = localStorage.getItem(KEY_PROGRESS);
-        if(p) state.progress = JSON.parse(p) || {};
-      }catch(e){}
+      try{ const p = localStorage.getItem(KEY_PROGRESS); if(p) state.progress = JSON.parse(p) || {}; }catch(e){}
       try{
         const s = localStorage.getItem(KEY_SETTINGS);
         if(s){
           const o = JSON.parse(s);
-          if(o && typeof o === "object") state.settings.sound = !!o.sound;
+          if(o && typeof o === "object"){
+            state.musicOn = !!o.musicOn;
+          }
         }
+      }catch(e){}
+      try{
+        const b = localStorage.getItem(KEY_GAMEBEST);
+        if(b) game.best = parseInt(b,10) || 0;
       }catch(e){}
     }
     function saveProgress(){ localStorage.setItem(KEY_PROGRESS, JSON.stringify(state.progress)); }
-    function saveSettings(){ localStorage.setItem(KEY_SETTINGS, JSON.stringify(state.settings)); }
+    function saveSettings(){ localStorage.setItem(KEY_SETTINGS, JSON.stringify({musicOn: state.musicOn})); }
 
     /* ============================================================
       DOM
     ============================================================ */
     const starsEl = document.getElementById("stars");
-    const gridEl = document.getElementById("grid");
+    const screenStart = document.getElementById("screenStart");
+    const screenHub = document.getElementById("screenHub");
+    const btnStart = document.getElementById("btnStart");
+    const startVideo = document.getElementById("startVideo");
+
+    const cupsEl = document.getElementById("cups");
     const progText = document.getElementById("progText");
     const progFill = document.getElementById("progFill");
-    const btnSound = document.getElementById("btnSound");
-    const soundLabel = document.getElementById("soundLabel");
+
+    const musicText = document.getElementById("musicText");
+    const btnMusic = document.getElementById("btnMusic");
     const btnReset = document.getElementById("btnReset");
 
     const overlay = document.getElementById("overlay");
     const modalTitle = document.getElementById("modalTitle");
-    const modalMeta = document.getElementById("modalMeta");
-    const modalType = document.getElementById("modalType");
-    const modalDone = document.getElementById("modalDone");
-    const btnClose = document.getElementById("btnClose");
-    const btnEnd = document.getElementById("btnEnd");
-    const btnNext = document.getElementById("btnNext");
+    const metaStep = document.getElementById("metaStep");
+    const metaType = document.getElementById("metaType");
+    const metaStatus = document.getElementById("metaStatus");
     const typedEl = document.getElementById("typed");
     const typeHint = document.getElementById("typeHint");
+    const btnBeendenTop = document.getElementById("btnBeendenTop");
+    const btnBeenden = document.getElementById("btnBeenden");
+    const btnWeiter = document.getElementById("btnWeiter");
+    const paperBox = document.getElementById("paperBox");
     const thinking = document.getElementById("thinking");
 
-    const imgRow = document.getElementById("imgRow");
-    const twinBox = document.getElementById("twinBox");
+    const twinRow = document.getElementById("twinRow");
+    const twinSquare = document.getElementById("twinSquare");
     const twinImg = document.getElementById("twinImg");
 
     const gameArea = document.getElementById("gameArea");
@@ -1420,106 +1250,147 @@
     const gStateEl = document.getElementById("gState");
 
     const victory = document.getElementById("victory");
-    const btnCloseVictory = document.getElementById("btnCloseVictory");
-    const vicMsg = document.getElementById("vicMsg");
-    const vicSound = document.getElementById("vicSound");
-    const cupImg = document.getElementById("cupImg");
-    const cupBox = document.getElementById("cupBox");
-
+    const btnVictoryClose = document.getElementById("btnVictoryClose");
     const confettiCanvas = document.getElementById("confetti");
     const cctx = confettiCanvas.getContext("2d");
 
+    const bgm = document.getElementById("bgm");
+
     /* ============================================================
-      Stars generator
+      Helpers
     ============================================================ */
+    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+    const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+
     function makeStars(){
       const W = window.innerWidth;
       const H = window.innerHeight;
       starsEl.innerHTML = "";
-      const count = Math.min(120, Math.floor((W*H)/13000));
+      const count = Math.min(140, Math.floor((W*H)/11500));
       for(let i=0;i<count;i++){
         const s = document.createElement("div");
         s.className = "star";
-        const x = Math.random()*100;
-        const y = Math.random()*100;
-        const d = 1.7 + Math.random()*2.6;
-        const a = 0.5 + Math.random()*0.9;
-        s.style.left = x + "%";
-        s.style.top = y + "%";
-        s.style.animationDuration = (2.0 + Math.random()*2.8) + "s";
-        s.style.opacity = String(a);
-        s.style.transform = `scale(${d/3})`;
+        s.style.left = (Math.random()*100) + "%";
+        s.style.top  = (Math.random()*100) + "%";
+        s.style.animationDuration = (2.0 + Math.random()*3.0) + "s";
+        s.style.opacity = String(0.45 + Math.random()*0.55);
         starsEl.appendChild(s);
       }
     }
 
-    /* ============================================================
-      Icon SVGs (simple, pixel-ish)
-    ============================================================ */
-    function iconSVG(kind){
-      // Each returns an SVG string (white-ish strokes)
-      const base = `stroke="rgba(255,255,255,.92)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
-      switch(kind){
-        case "eye":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><path ${base} d="M12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>`;
-        case "cake":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M7 10h10v10H7z"/><path ${base} d="M7 14c1 1 2 1 3 0s2-1 3 0 2 1 3 0 2-1 3 0"/><path ${base} d="M9 7c0-1.5 3-1.5 3 0 0 1-1 2-1.5 3-.5-1-1.5-2-1.5-3z"/></svg>`;
-        case "mush":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M5 12c0-4 3-7 7-7s7 3 7 7H5z"/><path ${base} d="M9 12v6c0 1 1 2 3 2s3-1 3-2v-6"/><path ${base} d="M8 9h.01M12 8h.01M16 9h.01"/></svg>`;
-        case "num":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M8 7h8M7 12h10M8 17h8"/><path ${base} d="M10 5l-2 14M16 5l-2 14"/></svg>`;
-        case "heart":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M12 20s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg>`;
-        case "people":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M16 11a3 3 0 1 0-6 0"/><path ${base} d="M5 20c1-4 13-4 14 0"/><path ${base} d="M7.5 9.5a2 2 0 1 0 0 .01"/><path ${base} d="M18 9.5a2 2 0 1 0 0 .01"/></svg>`;
-        case "ping":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M7 20l3-9c.6-2 2.4-3 4-3h3l-1 6h-4l-2 6z"/><path ${base} d="M15 8l2-4"/></svg>`;
-        case "run":
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M13 5h.01"/><path ${base} d="M12 7l2 2 3 1"/><path ${base} d="M11 9l-2 4 2 2-1 4"/><path ${base} d="M13 13l4 2 2 4"/><path ${base} d="M4 20h16"/></svg>`;
-        default:
-          return `<svg class="iconSVG" viewBox="0 0 24 24"><path ${base} d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z"/></svg>`;
-      }
+    function countDone(){
+      return ITEMS.reduce((a,it)=>a + (state.progress[it.id] ? 1 : 0), 0);
+    }
+    function updateProgressUI(){
+      const done = countDone();
+      const total = ITEMS.length;
+      progText.textContent = `Fortschritt: ${done} / ${total}`;
+      progFill.style.width = total ? Math.round(done/total*100) + "%" : "0%";
     }
 
+    function updateMusicUI(){
+      musicText.textContent = "Music: " + (state.musicOn ? "AN" : "AUS");
+    }
+
+    function getItem(id){ return ITEMS.find(x=>x.id===id); }
+
     /* ============================================================
-      Build grid tiles
+      Music (M toggle)
     ============================================================ */
-    function buildGrid(){
-      gridEl.innerHTML = "";
+    async function startMusicIfAllowed(){
+      try{
+        if(!state.musicOn){
+          bgm.pause();
+          return;
+        }
+        bgm.volume = 0.65;
+        await bgm.play();
+      }catch(e){
+        // autoplay block is fine; user can press M or click toggle
+      }
+    }
+    function setMusic(on){
+      state.musicOn = !!on;
+      saveSettings();
+      updateMusicUI();
+      if(!state.started) return;
+      if(state.musicOn) startMusicIfAllowed();
+      else bgm.pause();
+    }
+    function toggleMusic(){ setMusic(!state.musicOn); }
+    btnMusic.addEventListener("click", toggleMusic);
+
+    /* ============================================================
+      Start -> Hub
+    ============================================================ */
+    function showHub(){
+      screenStart.classList.remove("show");
+      screenHub.classList.add("show");
+      state.started = true;
+
+      buildCups();
+      updateProgressUI();
+      updateMusicUI();
+
+      startMusicIfAllowed();
+    }
+
+    btnStart.addEventListener("click", showHub);
+
+    window.addEventListener("keydown", (e)=>{
+      if(screenStart.classList.contains("show") && e.key === "Enter"){
+        e.preventDefault();
+        showHub();
+      }
+    });
+
+    /* ============================================================
+      Build Cups
+    ============================================================ */
+    function buildCups(){
+      cupsEl.innerHTML = "";
       ITEMS.forEach((it, idx)=>{
-        const tile = document.createElement("button");
-        tile.type = "button";
-        tile.className = "tile px";
-        tile.setAttribute("data-id", it.id);
-        tile.setAttribute("aria-label", it.title);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "cupBtn px";
+        btn.style.animationDelay = (idx * 80) + "ms";
+        btn.setAttribute("data-id", it.id);
+        if(state.progress[it.id]) btn.classList.add("done");
 
-        const done = !!state.progress[it.id];
-        if(done) tile.classList.add("done");
-
-        const num = idx+1;
-        tile.innerHTML = `
-          <div class="tileTop">
-            <div class="iconBadge" aria-hidden="true">${iconSVG(it.icon)}</div>
-            <div class="stamp"><span class="miniDot"></span><span>${done ? "gesehen" : "offen"}</span></div>
+        btn.innerHTML = `
+          <div class="cupTop">
+            <div class="cupIcon"><img alt="" /></div>
+            <div class="cupStamp"><span class="miniDot"></span><span>${state.progress[it.id] ? "gesehen" : "offen"}</span></div>
           </div>
-
-          <div class="tileTitle">
+          <div class="cupTitle">
             <div class="t">${escapeHTML(it.title)}</div>
             <div class="s">${escapeHTML(it.subtitle || "")}</div>
           </div>
-
-          <div class="tileHint">
+          <div class="cupFooter">
             <div>Öffnen</div>
-            <div><span class="kbd">${num}</span></div>
+            <div><span class="kbd">${idx+1}</span></div>
           </div>
         `;
 
-        tile.addEventListener("click", ()=>{
-          open(it.id);
-        });
+        const img = btn.querySelector(".cupIcon img");
+        img.src = it.icon;
+        img.onerror = ()=>{ img.style.opacity = "0"; };
 
-        gridEl.appendChild(tile);
+        btn.addEventListener("click", ()=> openModal(it.id));
+        cupsEl.appendChild(btn);
       });
+    }
+
+    function refreshCups(){
+      const btns = [...cupsEl.querySelectorAll(".cupBtn")];
+      btns.forEach(b=>{
+        const id = b.getAttribute("data-id");
+        const done = !!state.progress[id];
+        b.classList.toggle("done", done);
+        const stamp = b.querySelector(".cupStamp span:last-child");
+        if(stamp) stamp.textContent = done ? "gesehen" : "offen";
+      });
+      updateProgressUI();
     }
 
     function escapeHTML(str){
@@ -1532,31 +1403,7 @@
     }
 
     /* ============================================================
-      Progress + Victory
-    ============================================================ */
-    function countDone(){
-      return ITEMS.reduce((a,it)=>a + (state.progress[it.id] ? 1 : 0), 0);
-    }
-
-    function updateProgressUI(){
-      const done = countDone();
-      const total = ITEMS.length;
-      progText.textContent = `Fortschritt: ${done} / ${total}`;
-      const pct = total ? Math.round(done/total*100) : 0;
-      progFill.style.width = pct + "%";
-
-      soundLabel.textContent = state.settings.sound ? "AN" : "AUS";
-      vicSound.textContent = state.settings.sound ? "AN" : "AUS";
-    }
-
-    function maybeVictory(){
-      if(countDone() === ITEMS.length){
-        showVictory();
-      }
-    }
-
-    /* ============================================================
-      Modal open/close
+      Modal
     ============================================================ */
     function showOverlay(){
       overlay.classList.add("show");
@@ -1572,352 +1419,243 @@
       await sleep(ms);
       thinking.classList.remove("show");
     }
-    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
 
-    function open(id){
-      const it = ITEMS.find(x=>x.id===id);
+    function openModal(id){
+      const it = getItem(id);
       if(!it) return;
 
       state.openId = id;
       state.segIndex = 0;
+      state.typing = false;
+      state.skip = false;
 
-      // header
       modalTitle.textContent = it.title;
-      modalType.textContent = it.type === "game" ? "GAME" : "TEXT";
-      modalDone.textContent = state.progress[id] ? "Status: gesehen" : "Status: offen";
-
-      // segment meta
-      modalMeta.textContent = `${state.segIndex+1} / ${it.segments.length}`;
-
-      // buttons
-      btnNext.style.display = (it.type === "text" && it.segments.length > 1) ? "inline-flex" : (it.type==="text" ? "none" : "none");
-
-      // show/hide image
-      imgRow.style.display = "none";
-      twinBox.style.display = "none";
-
-      if(it.showTwinImage){
-        imgRow.style.display = "flex";
-        twinBox.style.display = "block";
-
-        // if missing file, hide the box automatically
-        twinImg.onerror = () => { twinBox.style.display = "none"; };
-      }
-
-      // show/hide game
-      if(it.type === "game"){
-        gameArea.style.display = "grid";
-        btnNext.style.display = "none";
-        typeHint.textContent = "Jump Game — Space / ↑ / Klick springt";
-      }else{
-        gameArea.style.display = "none";
-        typeHint.textContent = "Satz wird getippt… (klick oder Enter = sofort fertig)";
-        stopGame();
-      }
+      metaType.textContent = it.type === "game" ? "GAME" : "TEXT";
+      metaStatus.textContent = state.progress[id] ? "Status: gesehen" : "Status: offen";
 
       typedEl.textContent = "";
-      showOverlay();
 
-      // thinking vibe
+      // twin image only on birthday twins
+      twinRow.style.display = "none";
+      twinSquare.style.display = "none";
+      if(it.showTwin){
+        twinRow.style.display = "flex";
+        twinSquare.style.display = "block";
+        twinImg.onerror = ()=>{ twinSquare.style.display = "none"; };
+      }
+
+      // game
+      if(it.type === "game"){
+        typeHint.textContent = "Jump Game — Space / ↑ / Klick = springen";
+        gameArea.style.display = "flex";
+        btnWeiter.style.display = "none";
+      }else{
+        typeHint.textContent = "Satz wird getippt… (klick/Enter = sofort fertig)";
+        gameArea.style.display = "none";
+      }
+
+      showOverlay();
       playOpen();
+
       showThinking(560).then(()=>{
         if(it.type === "game"){
+          typedEl.textContent = it.segments[0] || "";
+          metaStep.textContent = `1 / 1`;
+          metaStatus.textContent = "Status: spiel läuft";
           startGame();
         }else{
-          typeSegment();
+          typeCurrentSegment();
         }
       });
     }
 
-    function close(){
+    function closeModal(){
       stopGame();
       hideOverlay();
       state.openId = null;
       state.segIndex = 0;
-      state.typedBusy = false;
-      state.typedSkip = false;
+      state.typing = false;
+      state.skip = false;
       playClose();
-    }
-
-    btnClose.addEventListener("click", close);
-    btnEnd.addEventListener("click", ()=>{
-      // if user closes while still typing, we still allow
-      // mark as done only if they have reached last segment (text) OR opened game (game)
-      finalizeIfEligible();
-      close();
       maybeVictory();
-    });
-
-    /* ============================================================
-      Typewriter (zeichen für zeichen)
-      - click / Enter => instantly reveal full line
-      - Weiter => next segment
-    ============================================================ */
-    function currentItem(){
-      return ITEMS.find(x=>x.id===state.openId);
     }
 
-    function finalizeIfEligible(){
-      const it = currentItem();
+    function canMarkDoneText(it){
+      return (state.segIndex >= it.segments.length - 1) && !state.typing;
+    }
+
+    function finalizeProgress(){
+      const it = getItem(state.openId);
       if(!it) return;
 
       if(it.type === "game"){
-        // mark done when they end the game popup
-        state.progress[it.id] = true;
+        if(state.gameTouched){
+          state.progress[it.id] = true;
+        }
       }else{
-        // mark done only if they reached last segment (segIndex at last)
-        if(state.segIndex >= it.segments.length - 1){
+        if(canMarkDoneText(it)){
           state.progress[it.id] = true;
         }
       }
       saveProgress();
-      updateProgressUI();
-      buildGrid();
-      modalDone.textContent = state.progress[it.id] ? "Status: gesehen" : "Status: offen";
+      refreshCups();
+      metaStatus.textContent = state.progress[it.id] ? "Status: gesehen" : "Status: offen";
     }
 
-    async function typeSegment(){
-      const it = currentItem();
+    btnBeendenTop.addEventListener("click", ()=>{ finalizeProgress(); closeModal(); });
+    btnBeenden.addEventListener("click", ()=>{ finalizeProgress(); closeModal(); });
+
+    btnWeiter.addEventListener("click", ()=>{
+      const it = getItem(state.openId);
       if(!it || it.type !== "text") return;
 
-      const seg = it.segments[state.segIndex] ?? "";
-      modalMeta.textContent = `${state.segIndex+1} / ${it.segments.length}`;
+      if(state.typing){
+        state.skip = true;
+        playSkip();
+        return;
+      }
+      if(state.segIndex < it.segments.length - 1){
+        state.segIndex++;
+        playNext();
+        typeCurrentSegment();
+      }
+    });
 
-      // show/hide Weiter
-      const hasMore = state.segIndex < it.segments.length - 1;
-      btnNext.style.display = hasMore ? "inline-flex" : "none";
+    paperBox.addEventListener("click", ()=>{
+      const it = getItem(state.openId);
+      if(!it || it.type !== "text") return;
+      if(state.typing){
+        state.skip = true;
+        playSkip();
+      }
+    });
 
+    async function typeCurrentSegment(){
+      const it = getItem(state.openId);
+      if(!it || it.type !== "text") return;
+
+      const total = it.segments.length;
+      metaStep.textContent = `${state.segIndex + 1} / ${total}`;
+
+      const hasMore = state.segIndex < total - 1;
+      btnWeiter.style.display = hasMore ? "inline-flex" : "none";
+
+      const seg = it.segments[state.segIndex] || "";
       typedEl.textContent = "";
-      state.typedBusy = true;
-      state.typedSkip = false;
+      state.typing = true;
+      state.skip = false;
 
-      // per-character speed (slightly varied)
-      const baseDelay = 16; // fast, but still visible
-      const extra = 22;
+      const baseDelay = 13;
+      const extra = 26;
 
       for(let i=0;i<seg.length;i++){
-        if(state.typedSkip){
+        if(state.skip){
           typedEl.textContent = seg;
           break;
         }
         typedEl.textContent += seg[i];
-
-        // tiny key sound
         playTypeTick(i);
-
         const ch = seg[i];
-        const d = baseDelay + (ch===" " ? 6 : 0) + (Math.random()*extra);
+        const d = baseDelay + (ch===" " ? 7 : 0) + (Math.random()*extra);
         await sleep(d);
       }
+      state.typing = false;
 
-      state.typedBusy = false;
-
-      // if last segment finished typing, mark as eligible (not fully done until Beenden, but we set status hint)
-      if(!hasMore){
-        modalDone.textContent = "Status: bereit zum beenden";
-      }else{
-        modalDone.textContent = "Status: weiter verfügbar";
-      }
+      metaStatus.textContent = hasMore ? "Status: weiter verfügbar" : "Status: bereit zum beenden";
     }
 
-    btnNext.addEventListener("click", async ()=>{
-      const it = currentItem();
-      if(!it || it.type!=="text") return;
-
-      // if still typing: skip to full reveal
-      if(state.typedBusy){
-        state.typedSkip = true;
-        playSkip();
-        return;
-      }
-
-      // next segment
-      if(state.segIndex < it.segments.length - 1){
-        state.segIndex++;
-        playNext();
-        await typeSegment();
-      }
-
-      // if we just reached last, we can mark completion only when user ends (your rule: end after everything seen)
-      modalMeta.textContent = `${state.segIndex+1} / ${it.segments.length}`;
-    });
-
-    // click inside type box to skip typing
-    document.querySelector(".typeBox").addEventListener("click", ()=>{
-      const it = currentItem();
-      if(!it || it.type!=="text") return;
-      if(state.typedBusy){
-        state.typedSkip = true;
-        playSkip();
-      }
-    });
-
     /* ============================================================
-      Keyboard:
-      - 1..9 opens tiles
-      - Enter => if typing: skip; else if next exists: next; else nothing
-      - Esc => end/close
-      - M toggle sound
-      - R reset
-      - Game: Space/Up jump
+      Keys
     ============================================================ */
     window.addEventListener("keydown", (e)=>{
       const k = e.key.toLowerCase();
 
-      // global toggles
+      // music toggle everywhere
       if(k === "m"){
-        toggleSound();
+        e.preventDefault();
+        toggleMusic();
         return;
       }
+
+      // reset
       if(k === "r"){
+        e.preventDefault();
         doReset();
         return;
       }
 
-      const isOpen = overlay.classList.contains("show");
-      const isVictory = victory.classList.contains("show");
-
-      if(isVictory){
+      // victory close
+      if(victory.classList.contains("show")){
         if(k === "escape" || k === "enter" || k === " "){
+          e.preventDefault();
           hideVictory();
           playClose();
         }
         return;
       }
 
-      if(!isOpen){
-        // open by number
+      // open cups by number (only on hub, not in modal)
+      if(state.started && !overlay.classList.contains("show")){
         if(/^[1-9]$/.test(k)){
           const idx = parseInt(k,10) - 1;
           const it = ITEMS[idx];
-          if(it) open(it.id);
+          if(it) openModal(it.id);
         }
         return;
       }
 
-      // modal open
-      if(k === "escape"){
-        e.preventDefault();
-        finalizeIfEligible();
-        close();
-        maybeVictory();
-        return;
-      }
+      // modal behavior
+      if(overlay.classList.contains("show")){
+        const it = getItem(state.openId);
+        if(!it) return;
 
-      const it = currentItem();
-      if(!it) return;
-
-      if(it.type === "text"){
-        if(k === "enter"){
+        if(k === "escape"){
           e.preventDefault();
-          if(state.typedBusy){
-            state.typedSkip = true;
+          finalizeProgress();
+          closeModal();
+          return;
+        }
+
+        if(it.type === "text" && k === "enter"){
+          e.preventDefault();
+          if(state.typing){
+            state.skip = true;
             playSkip();
           }else{
-            // if next exists, go next; else do nothing (user can end)
             if(state.segIndex < it.segments.length - 1){
-              btnNext.click();
+              btnWeiter.click();
             }
           }
         }
-      }
 
-      // game keys handled in game section (space/up)
+        if(it.type === "game"){
+          if(k === " " || k === "arrowup"){
+            e.preventDefault();
+            jump();
+          }
+        }
+      }
     });
 
-    /* ============================================================
-      Reset
-    ============================================================ */
+    btnReset.addEventListener("click", doReset);
+
     function doReset(){
-      if(confirm("Reset wirklich? (Fortschritt + Bestscore werden gelöscht)")){
+      const ok = confirm("Reset wirklich? (Fortschritt + Bestscore werden gelöscht)");
+      if(ok){
         state.progress = {};
+        state.gameTouched = false;
         localStorage.removeItem(KEY_PROGRESS);
         localStorage.removeItem(KEY_GAMEBEST);
-        updateProgressUI();
-        buildGrid();
+        refreshCups();
         hideVictory();
         playClose();
       }else{
         playClose();
       }
     }
-    btnReset.addEventListener("click", doReset);
 
     /* ============================================================
-      Sound (WebAudio synth)
-    ============================================================ */
-    let audioCtx = null;
-    function ensureAudio(){
-      if(!state.settings.sound) return null;
-      if(!audioCtx){
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if(!Ctx) return null;
-        audioCtx = new Ctx();
-      }
-      if(audioCtx && audioCtx.state === "suspended"){
-        audioCtx.resume().catch(()=>{});
-      }
-      return audioCtx;
-    }
-
-    function tone({type="square", f=440, d=0.06, v=0.06, slide=null}={}){
-      const ctx = ensureAudio();
-      if(!ctx) return;
-      const t0 = ctx.currentTime;
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = type;
-      o.frequency.setValueAtTime(f, t0);
-      if(slide) o.frequency.exponentialRampToValueAtTime(slide, t0 + d);
-      g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(v, t0 + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(t0); o.stop(t0 + d + 0.02);
-    }
-
-    function playOpen(){
-      tone({type:"triangle", f:520, d:0.08, v:0.06, slide:760});
-      setTimeout(()=>tone({type:"square", f:760, d:0.06, v:0.05, slide:980}), 60);
-    }
-    function playClose(){
-      tone({type:"square", f:260, d:0.08, v:0.05, slide:180});
-    }
-    function playNext(){
-      tone({type:"triangle", f:700, d:0.06, v:0.06, slide:920});
-    }
-    function playSkip(){
-      tone({type:"sine", f:820, d:0.04, v:0.04, slide:740});
-    }
-    function playTypeTick(i){
-      // very subtle tick (not every char)
-      if(!state.settings.sound) return;
-      if(i % 2 !== 0) return;
-      tone({type:"square", f: (420 + (i%14)*10), d:0.02, v:0.01});
-    }
-    function playWin(){
-      tone({type:"triangle", f:523, d:0.10, v:0.06});
-      setTimeout(()=>tone({type:"triangle", f:659, d:0.10, v:0.06}), 90);
-      setTimeout(()=>tone({type:"triangle", f:784, d:0.12, v:0.07}), 180);
-      setTimeout(()=>tone({type:"square", f:1046, d:0.14, v:0.07}), 280);
-    }
-
-    function toggleSound(){
-      state.settings.sound = !state.settings.sound;
-      saveSettings();
-      updateProgressUI();
-      if(state.settings.sound) ensureAudio();
-      tone({type:"sine", f: (state.settings.sound? 740 : 240), d:0.06, v:0.05, slide: (state.settings.sound? 920 : 180)});
-    }
-    btnSound.addEventListener("click", toggleSound);
-
-    // unlock audio on first pointer
-    window.addEventListener("pointerdown", ()=>{
-      if(state.settings.sound) ensureAudio();
-    }, {once:true});
-
-    /* ============================================================
-      Victory overlay + confetti
+      Victory + confetti
     ============================================================ */
     let confettiRAF = null;
     let confettiParts = [];
@@ -1935,12 +1673,13 @@
       confettiParts = [];
       const rect = confettiCanvas.getBoundingClientRect();
       const W = rect.width, H = rect.height;
-      for(let i=0;i<160;i++){
+
+      for(let i=0;i<170;i++){
         confettiParts.push({
           x: Math.random()*W,
           y: -20 - Math.random()*H,
-          vx: -0.6 + Math.random()*1.2,
-          vy: 1.4 + Math.random()*3.2,
+          vx: -0.7 + Math.random()*1.4,
+          vy: 1.6 + Math.random()*3.6,
           w: 3 + Math.random()*6,
           h: 2 + Math.random()*4,
           t: Math.random()*Math.PI*2,
@@ -1957,16 +1696,15 @@
           p.x += p.vx;
           p.y += p.vy;
           p.t += 0.08;
+
           if(p.y > H2 + 30){
             p.y = -20;
             p.x = Math.random()*W2;
           }
-
           const wob = Math.sin(p.t)*2;
           cctx.globalAlpha = p.a;
-
           const hue = (p.t * 60) % 360;
-          cctx.fillStyle = `hsla(${hue}, 90%, 65%, 0.95)`;
+          cctx.fillStyle = `hsla(${hue}, 92%, 65%, 0.95)`;
           cctx.fillRect(p.x + wob, p.y, p.w, p.h);
         });
 
@@ -1990,15 +1728,6 @@
       victory.setAttribute("aria-hidden","false");
       playWin();
       startConfetti();
-
-      // show cup.png if it exists
-      cupBox.style.display = "none";
-      cupImg.onerror = ()=>{ cupBox.style.display = "none"; };
-      cupImg.onload = ()=>{ cupBox.style.display = "block"; };
-      // if cached & instantly available:
-      if(cupImg.complete && cupImg.naturalWidth > 0){
-        cupBox.style.display = "block";
-      }
     }
 
     function hideVictory(){
@@ -2007,19 +1736,60 @@
       stopConfetti();
     }
 
-    btnCloseVictory.addEventListener("click", ()=>{
-      hideVictory();
-      playClose();
-    });
+    btnVictoryClose.addEventListener("click", ()=>{ hideVictory(); playClose(); });
 
-    window.addEventListener("resize", ()=>{
-      makeStars();
-      if(victory.classList.contains("show")) resizeConfetti();
-    });
+    function maybeVictory(){
+      if(countDone() === ITEMS.length){
+        showVictory();
+      }
+    }
 
     /* ============================================================
-      Pilz-Cup Jump Game (simple dino-like)
-      Runner: "67"
+      Sounds (WebAudio, pixel-ish)
+    ============================================================ */
+    let audioCtx = null;
+    function ensureAudio(){
+      if(!audioCtx){
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if(!Ctx) return null;
+        audioCtx = new Ctx();
+      }
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume().catch(()=>{});
+      }
+      return audioCtx;
+    }
+
+    function tone({type="square", f=440, d=0.06, v=0.06, slide=null}={}){
+      const ctx = ensureAudio();
+      if(!ctx) return;
+      const t0 = ctx.currentTime;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(f, t0);
+      if(slide) o.frequency.exponentialRampToValueAtTime(slide, t0 + d);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(v, t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t0); o.stop(t0 + d + 0.02);
+    }
+
+    function playOpen(){ tone({type:"triangle", f:520, d:0.08, v:0.06, slide:760}); setTimeout(()=>tone({type:"square", f:760, d:0.06, v:0.05, slide:980}), 60); }
+    function playClose(){ tone({type:"square", f:260, d:0.08, v:0.05, slide:180}); }
+    function playNext(){ tone({type:"triangle", f:700, d:0.06, v:0.06, slide:920}); }
+    function playSkip(){ tone({type:"sine", f:820, d:0.04, v:0.04, slide:740}); }
+    function playTypeTick(i){ if(i % 2 !== 0) return; tone({type:"square", f: (420 + (i%12)*12), d:0.02, v:0.008}); }
+    function playWin(){
+      tone({type:"triangle", f:523, d:0.10, v:0.06});
+      setTimeout(()=>tone({type:"triangle", f:659, d:0.10, v:0.06}), 90);
+      setTimeout(()=>tone({type:"triangle", f:784, d:0.12, v:0.07}), 180);
+      setTimeout(()=>tone({type:"square", f:1046, d:0.14, v:0.07}), 280);
+    }
+
+    /* ============================================================
+      Tortuga Jump Game (67)
     ============================================================ */
     const game = {
       ctx: jumpCanvas.getContext("2d"),
@@ -2028,14 +1798,10 @@
       t:0,
       score:0,
       best:0,
-
-      // player
       x:120,
       y:0,
       vy:0,
       onGround:true,
-
-      // world
       groundY: 320,
       speed: 6.2,
       spawn: 0,
@@ -2045,24 +1811,22 @@
 
     function loadBest(){
       try{
-        const raw = localStorage.getItem(KEY_GAMEBEST);
-        game.best = raw ? (parseInt(raw,10) || 0) : 0;
+        const b = localStorage.getItem(KEY_GAMEBEST);
+        game.best = b ? (parseInt(b,10) || 0) : 0;
       }catch(e){ game.best = 0; }
       gBestEl.textContent = String(game.best);
     }
-
-    function saveBest(){
-      localStorage.setItem(KEY_GAMEBEST, String(game.best));
-    }
+    function saveBest(){ localStorage.setItem(KEY_GAMEBEST, String(game.best)); }
 
     function startGame(){
       loadBest();
+      state.gameTouched = false;
       game.running = true;
       game.over = false;
       game.t = performance.now();
       game.score = 0;
       game.speed = 6.2;
-      game.spawn = 0.8;
+      game.spawn = 0.9;
       game.obstacles = [];
       game.y = game.groundY;
       game.vy = 0;
@@ -2097,14 +1861,12 @@
     function updateGame(dt){
       if(!game.running) return;
 
-      // speed up a bit
       game.speed += dt * 0.35;
 
-      // score
       game.score += dt * 60;
+      if(game.score >= 1) state.gameTouched = true;
       gScoreEl.textContent = String(Math.floor(game.score));
 
-      // gravity
       const g = 1900;
       game.vy += g * dt;
       game.y += game.vy * dt;
@@ -2115,42 +1877,29 @@
         game.onGround = true;
       }
 
-      // spawn obstacles
       game.spawn -= dt;
       if(game.spawn <= 0){
         game.spawn = 0.85 + Math.random()*0.55;
         const h = 34 + Math.random()*28;
         const w = 18 + Math.random()*18;
-        game.obstacles.push({
-          x: 980 + 60,
-          y: game.groundY,
-          w, h
-        });
+        game.obstacles.push({ x: 980 + 60, y: game.groundY, w, h });
       }
 
-      // move obstacles
       const vx = game.speed * 70 * dt;
-      for(const o of game.obstacles){
-        o.x -= vx;
-      }
+      for(const o of game.obstacles){ o.x -= vx; }
       game.obstacles = game.obstacles.filter(o => o.x > -80);
 
-      // collision
       const px = game.x, py = game.y;
-      const pW = 46, pH = 52; // approximate for "67"
-      for(const o of game.obstacles){
-        const ox = o.x, oy = o.y;
-        const ow = o.w, oh = o.h;
-        const hit =
-          (px < ox + ow) &&
-          (px + pW > ox) &&
-          (py - pH < oy) &&
-          (py > oy - oh);
+      const pW = 46, pH = 52;
 
-        if(hit){
-          gameOver();
-          break;
-        }
+      for(const o of game.obstacles){
+        const hit =
+          (px < o.x + o.w) &&
+          (px + pW > o.x) &&
+          (py - pH < o.y) &&
+          (py > o.y - o.h);
+
+        if(hit){ gameOver(); break; }
       }
     }
 
@@ -2167,10 +1916,12 @@
         saveBest();
         playNext();
       }
+      // allow marking as done even if only a short run happened
+      state.gameTouched = true;
     }
 
     function jump(){
-      const it = currentItem();
+      const it = getItem(state.openId);
       if(!it || it.type !== "game") return;
 
       if(game.over){
@@ -2180,83 +1931,58 @@
       }
       if(game.onGround){
         game.onGround = false;
-        game.vy = -740; // jump strength
-        // jump sound
+        game.vy = -740;
         tone({type:"triangle", f:520, d:0.06, v:0.05, slide:760});
       }
     }
 
-    // input for game
     jumpCanvas.addEventListener("pointerdown", jump);
-    window.addEventListener("keydown", (e)=>{
-      const it = currentItem();
-      if(!it || it.type !== "game") return;
-      if(!overlay.classList.contains("show")) return;
-
-      const k = e.key.toLowerCase();
-      if(k === " " || k === "arrowup"){
-        e.preventDefault();
-        jump();
-      }
-    }, {passive:false});
 
     function renderGame(){
       const ctx = game.ctx;
       const W = jumpCanvas.width;
       const H = jumpCanvas.height;
-
       ctx.clearRect(0,0,W,H);
 
-      // sky gradient
+      // sky
       const grd = ctx.createLinearGradient(0,0,0,H);
       grd.addColorStop(0, "#e9f6ff");
       grd.addColorStop(1, "#cfeaff");
       ctx.fillStyle = grd;
       ctx.fillRect(0,0,W,H);
 
-      // distant pixel clouds
-      ctx.globalAlpha = 0.18;
-      ctx.fillStyle = "#0c1433";
-      for(let i=0;i<10;i++){
-        const x = (i*120 + (performance.now()*0.02)%120) % W;
-        ctx.fillRect(x, 70 + (i%3)*18, 54, 10);
-        ctx.fillRect(x+14, 60 + (i%3)*18, 30, 12);
-      }
+      // horizon line
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = "#0b1030";
+      ctx.fillRect(0, 210, W, 2);
       ctx.globalAlpha = 1;
 
       // ground
       ctx.fillStyle = "#6f7a88";
       ctx.fillRect(0, game.groundY, W, H - game.groundY);
-
-      // ground line
       ctx.fillStyle = "rgba(0,0,0,0.25)";
       ctx.fillRect(0, game.groundY, W, 4);
 
       // obstacles
       for(const o of game.obstacles){
-        ctx.fillStyle = "#ff4d9a";
+        ctx.fillStyle = "#ff4fa5";
         ctx.strokeStyle = "rgba(0,0,0,0.35)";
         ctx.lineWidth = 6;
         ctx.fillRect(o.x, o.y - o.h, o.w, o.h);
         ctx.strokeRect(o.x, o.y - o.h, o.w, o.h);
-
-        // pixel highlight
         ctx.fillStyle = "rgba(255,255,255,0.22)";
         ctx.fillRect(o.x + 4, o.y - o.h + 6, Math.max(4, o.w*0.25), 10);
       }
 
-      // runner "67"
+      // runner 67
       drawRunner67(ctx, game.x, game.y);
 
-      // scanlines on canvas (subtle)
+      // scanlines
       ctx.globalAlpha = 0.12;
       ctx.fillStyle = "#000";
-      for(let y=0;y<H;y+=6){
-        ctx.fillRect(0,y,W,1);
-      }
+      for(let y=0;y<H;y+=6){ ctx.fillRect(0,y,W,1); }
       ctx.globalAlpha = 1;
 
-      // overlay text
       if(game.over){
         ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fillRect(0,0,W,H);
@@ -2267,7 +1993,7 @@
         ctx.fillRect(W*0.18, H*0.22, W*0.64, H*0.22);
         ctx.strokeRect(W*0.18, H*0.22, W*0.64, H*0.22);
 
-        ctx.fillStyle = "#0c1433";
+        ctx.fillStyle = "#0b1030";
         ctx.font = "900 44px " + getComputedStyle(document.body).fontFamily;
         ctx.textAlign = "center";
         ctx.fillText("GAME OVER", W*0.50, H*0.34);
@@ -2278,33 +2004,27 @@
     }
 
     function drawRunner67(ctx, x, y){
-      // chunky pixel-ish text “67”
       ctx.save();
       ctx.translate(x, y);
 
-      // shadow
       ctx.fillStyle = "rgba(0,0,0,0.25)";
       ctx.fillRect(-4, 6, 54, 10);
 
-      // body plate
-      ctx.fillStyle = "#44f0ff";
+      ctx.fillStyle = "#3df3ff";
       ctx.strokeStyle = "rgba(0,0,0,0.35)";
       ctx.lineWidth = 7;
       ctx.fillRect(0, -56, 48, 48);
       ctx.strokeRect(0, -56, 48, 48);
 
-      // highlight
       ctx.fillStyle = "rgba(255,255,255,0.22)";
       ctx.fillRect(6, -50, 12, 30);
 
-      // text 67
-      ctx.fillStyle = "#0c1433";
+      ctx.fillStyle = "#0b1030";
       ctx.font = "900 28px " + getComputedStyle(document.body).fontFamily;
       ctx.textAlign = "center";
       ctx.fillText("67", 24, -22);
 
-      // tiny legs
-      ctx.fillStyle = "#0c1433";
+      ctx.fillStyle = "#0b1030";
       ctx.fillRect(8, -8, 10, 10);
       ctx.fillRect(30, -8, 10, 10);
 
@@ -2312,43 +2032,53 @@
     }
 
     /* ============================================================
-      Modal end behavior (mark done rules)
+      Victory logic
     ============================================================ */
-    function onEndPressed(){
-      finalizeIfEligible();
-      close();
-      maybeVictory();
-    }
-    btnEnd.addEventListener("click", onEndPressed);
-    // closeX already triggers close; keep end button as main
-
-    /* ============================================================
-      Cup.png handling already in victory show; twin.png in modal.
-      Make sure twin box hides if missing file.
-    ============================================================ */
-    twinImg.onerror = ()=>{ twinBox.style.display = "none"; };
-
-    /* ============================================================
-      INIT
-    ============================================================ */
-    load();
-    makeStars();
-    buildGrid();
-    updateProgressUI();
-
-    // If cached victory condition
-    if(countDone() === ITEMS.length){
-      showVictory();
+    function showVictory(){
+      victory.classList.add("show");
+      victory.setAttribute("aria-hidden","false");
+      playWin();
+      startConfetti();
     }
 
-    // Close overlay if click on dark background? user didn’t ask, so we keep strict:
-    // Only beenden closes.
-    overlay.addEventListener("click", (e)=>{
-      // keep strict; no outside close
+    function hideVictory(){
+      victory.classList.remove("show");
+      victory.setAttribute("aria-hidden","true");
+      stopConfetti();
+    }
+
+    function maybeVictory(){
+      if(countDone() === ITEMS.length){
+        showVictory();
+      }
+    }
+
+    /* ============================================================
+      Global init
+    ============================================================ */
+    function init(){
+      load();
+      makeStars();
+      updateMusicUI();
+
+      // Try enable video if file exists (best-effort)
+      // If mp4 missing, video stays hidden.
+      startVideo.addEventListener("error", ()=>{});
+      startVideo.addEventListener("loadeddata", ()=>{
+        startVideo.classList.add("show");
+        startVideo.play().catch(()=>{});
+      });
+    }
+
+    window.addEventListener("resize", ()=>{
+      makeStars();
+      if(victory.classList.contains("show")) resizeConfetti();
     });
 
-    // "Enter" behavior for text: skip typing or next
-    // (already in keydown)
+    // unlock audio for UI beeps
+    window.addEventListener("pointerdown", ()=>{ ensureAudio(); }, {once:true});
+
+    init();
   </script>
 </body>
 </html>
