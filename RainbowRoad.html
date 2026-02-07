@@ -15,7 +15,7 @@
         - sideeye.jpg
         - twins.jpg
         - twin.png
-        - toadyoshi.jpg
+        - toadyoshi.png
         - 67.jpg
         - süslimüsli.jpg
         - ss.jpg
@@ -965,107 +965,129 @@
     }
 
     /* Mobile Layout: kompakter, weniger „fett“, besser verteilt */
-    @media (max-width: 720px){
-      .app{ padding: 10px; }
-      .stage{
-        height: 94dvh;
-        border-radius: 22px;
-      }
+  @media (max-width: 720px){
+  .app{ padding: 10px; }
 
-      .screen{ padding: 12px; }
+  /* Stage: iOS Adressleiste + safe area */
+  .stage{
+    height: calc(100dvh - 20px);
+    border-radius: 22px;
+  }
 
-      /* HUB oben kompakter */
-      .hubTop{
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
+  .screen{ padding: 12px; }
 
-      .hudLeft{ min-width: 0; }
-      .hudTitle{ gap: 8px; }
+  /* HUB oben kompakter */
+  .hubTop{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
 
-      .pill{
-        font-size: 11px;
-        padding: 7px 9px;
-      }
+  .hudLeft{ min-width: 0; }
+  .hudTitle{ gap: 8px; }
 
-      .bar{ width: 100%; height: 10px; }
+  .pill{
+    font-size: 11px;
+    padding: 7px 9px;
+  }
 
-      .hudRight{
-        width: 100%;
-        flex-direction: row;
-        align-items: stretch;
-        gap: 10px;
-      }
+  .bar{ width: 100%; height: 10px; }
 
-      .btnSmall{
-        width: 100%;
-        min-width: 0;
-        padding: 10px 10px;
-        border-radius: 16px;
-      }
+  /* Buttons: auf Mobile sauber */
+  .hudRight{
+    width: 100%;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 10px;
+  }
 
-      /* GridWrap: mehr Höhe, bessere Abstände */
-      .gridWrap{
-        padding: 12px;
-        border-radius: 22px;
-        height: calc(100% - 128px);
-      }
+  .btnSmall{
+    width: 100%;
+    min-width: 0;
+    padding: 10px 10px;
+    border-radius: 16px;
+  }
 
-      /* Cups: 1 Spalte, kleinere Icons, nicer spacing */
-      .cups{
-        grid-template-columns: 1fr !important;
-        gap: 12px;
-      }
+  /* GridWrap: NICHT quetschen -> lieber smooth scroll */
+  .gridWrap{
+    padding: 12px;
+    border-radius: 22px;
 
-      .cupBtn{
-        padding: 12px;
-        border-radius: 20px;
-        gap: 10px;
-      }
+    /* statt height: calc(100% - 128px); */
+    height: auto;
 
-      .cupIcon{
-        width: 64px;
-        height: 64px;
-        border-radius: 18px;
-      }
+    /* wichtig: nur dieser Bereich scrollt */
+    max-height: calc(100dvh - 250px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 
-      .cupTitle .t{ font-size: 15px; }
-      .cupTitle .s{ font-size: 11px; }
+    /* unten etwas Luft wegen iPhone Homebar */
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
 
-      /* Modal: mehr usable space */
-      .overlay{ padding: 10px; }
-      .modal{
-        height: 92dvh;
-        border-radius: 22px;
-      }
-      .modalInner{ padding: 12px; gap: 10px; }
-      .paper{ padding: 12px; }
-      .paperBox{ padding: 12px; }
-      .typed{ font-size: 14px; line-height: 1.75; }
+  /* Cups: 1 Spalte, sauberer Abstand */
+  .cups{
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
 
-      .modalFooter{
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .modalFooter > div:last-child{
-        width: 100%;
-        justify-content: space-between;
-      }
-      .btn{
-        width: 100%;
-        min-width: 0;
-        padding: 12px 12px;
-        border-radius: 18px;
-      }
+  .cupBtn{
+    padding: 12px;
+    border-radius: 20px;
+    gap: 10px;
+  }
 
-      /* Game area height */
-      #jumpGame{
-        height: 260px;
-      }
-    }
+  .cupIcon{
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+  }
+
+  .cupTitle .t{ font-size: 15px; }
+  .cupTitle .s{ font-size: 11px; }
+
+  /* Modal: mehr usable space */
+  .overlay{ padding: 10px; }
+
+  .modal{
+    height: calc(92dvh - env(safe-area-inset-top, 0px));
+    border-radius: 22px;
+  }
+
+  .modalInner{ padding: 12px; gap: 10px; }
+  .paper{ padding: 12px; }
+  .paperBox{ padding: 12px; }
+  .typed{ font-size: 14px; line-height: 1.75; }
+
+  .modalFooter{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .modalFooter > div:last-child{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn{
+    width: 100%;
+    min-width: 0;
+    padding: 12px 12px;
+    border-radius: 18px;
+  }
+
+  /* Game area height (dein Fix bleibt) */
+  #jumpGame{
+    height: 260px;
+  }
+}
+
+/* Extra: ganz kleine Handys -> Buttons untereinander */
+@media (max-width: 420px){
+  .hudRight{ flex-direction: column; }
+}
   </style>
 </head>
 
