@@ -21,7 +21,7 @@
         - ss.jpg
         - tischtennis.jpg
         - tortuga.jpg
-        Optional:
+      Optional:
         - Mario Kart DS - Rainbow Road.mp4
       Controls:
         - START / Enter -> begin, cups appear, music starts
@@ -947,6 +947,124 @@
     .startBtn:focus-visible, .btnSmall:focus-visible, .cupBtn:focus-visible, .btn:focus-visible, .closeBtn:focus-visible{
       outline: 3px solid rgba(61,243,255,.55);
       outline-offset: 4px;
+    }
+
+    /* ============================================================
+       MOBILE PATCH (Layout + bessere Scale)
+       + Touch fix fürs Game (kein Scroll/Zoom beim Tippen)
+    ============================================================ */
+
+    /* iOS: safer viewport (dynamic address bar) */
+    .stage{
+      height: min(780px, 92dvh);
+    }
+
+    /* Game touches: kein double-tap zoom / scroll jank */
+    #jumpGame, #gameArea{
+      touch-action: manipulation;
+    }
+
+    /* Mobile Layout: kompakter, weniger „fett“, besser verteilt */
+    @media (max-width: 720px){
+      .app{ padding: 10px; }
+      .stage{
+        height: 94dvh;
+        border-radius: 22px;
+      }
+
+      .screen{ padding: 12px; }
+
+      /* HUB oben kompakter */
+      .hubTop{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .hudLeft{ min-width: 0; }
+      .hudTitle{ gap: 8px; }
+
+      .pill{
+        font-size: 11px;
+        padding: 7px 9px;
+      }
+
+      .bar{ width: 100%; height: 10px; }
+
+      .hudRight{
+        width: 100%;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .btnSmall{
+        width: 100%;
+        min-width: 0;
+        padding: 10px 10px;
+        border-radius: 16px;
+      }
+
+      /* GridWrap: mehr Höhe, bessere Abstände */
+      .gridWrap{
+        padding: 12px;
+        border-radius: 22px;
+        height: calc(100% - 128px);
+      }
+
+      /* Cups: 1 Spalte, kleinere Icons, nicer spacing */
+      .cups{
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+      }
+
+      .cupBtn{
+        padding: 12px;
+        border-radius: 20px;
+        gap: 10px;
+      }
+
+      .cupIcon{
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+      }
+
+      .cupTitle .t{ font-size: 15px; }
+      .cupTitle .s{ font-size: 11px; }
+
+      /* Modal: mehr usable space */
+      .overlay{ padding: 10px; }
+      .modal{
+        height: 92dvh;
+        border-radius: 22px;
+      }
+      .modalInner{ padding: 12px; gap: 10px; }
+      .paper{ padding: 12px; }
+      .paperBox{ padding: 12px; }
+      .typed{ font-size: 14px; line-height: 1.75; }
+
+      .modalFooter{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .modalFooter > div:last-child{
+        width: 100%;
+        justify-content: space-between;
+      }
+      .btn{
+        width: 100%;
+        min-width: 0;
+        padding: 12px 12px;
+        border-radius: 18px;
+      }
+
+      /* Game area height */
+      #jumpGame{
+        height: 260px;
+      }
     }
   </style>
 </head>
@@ -1936,7 +2054,22 @@
       }
     }
 
-    jumpCanvas.addEventListener("pointerdown", jump);
+    // Jump: Canvas + kompletter Game-Bereich (auch auf Mobile zuverlässig)
+    jumpCanvas.addEventListener("pointerdown", (e)=>{
+      e.preventDefault();
+      jump();
+    });
+
+    gameArea.addEventListener("pointerdown", (e)=>{
+      e.preventDefault();
+      jump();
+    });
+
+    // iOS Safari: manchmal extra nötig
+    gameArea.addEventListener("touchstart", (e)=>{
+      e.preventDefault();
+      jump();
+    }, { passive:false });
 
     function renderGame(){
       const ctx = game.ctx;
@@ -2077,6 +2210,9 @@
 
     // unlock audio for UI beeps
     window.addEventListener("pointerdown", ()=>{ ensureAudio(); }, {once:true});
+
+    // verhindert iOS scroll-bounce im Overlay (wichtig für Game taps)
+    overlay.addEventListener("touchmove", (e)=> e.preventDefault(), { passive:false });
 
     init();
   </script>
